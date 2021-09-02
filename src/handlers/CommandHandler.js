@@ -8,7 +8,7 @@ class HandleCommand {
         var args = message.content.replace(config.prefix, "").split(" ");
         var command = args.shift();
         if (config.commands.indexOf(command) == -1) return;
-        import kommando from `${config.directory}/${config.command[config.commands.indexOf(command)]}`;
+        var kommando = require(`${config.directory}/${config.command[config.commands.indexOf(command)]}`);
         kommando.call(message, args);
     }
 }
