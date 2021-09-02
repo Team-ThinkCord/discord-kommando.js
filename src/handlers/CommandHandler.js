@@ -12,3 +12,5 @@ class HandleCommand {
         kommando.call(message, args);
     }
 }
+
+module.exports = HandleCommand;
