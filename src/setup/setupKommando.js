@@ -25,7 +25,7 @@ const setupKommando = function(dir, prefix, options) {
         commands,
         note: "※ Do not remove this file ※"
     }
-    fs.writeFileSync(`kommando_config.json`, JSON.stringify(kommandoconfig));
+    fs.writeFileSync(`kommando_config.json`, JSON.stringify(kommandoconfig, null, 2));
 }
 
 module.exports = setupKommando;
