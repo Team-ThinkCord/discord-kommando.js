@@ -8,7 +8,7 @@ const setupKommando = function(dir, prefix, options) {
     if (!fs.existsSync(dir)) throw ReferenceError(`Directory ${dir} was not found`);
     var commands = [];
     fs.readdirSync(dir).forEach(file => {
-        var command = require(`${dir}/${file}`);
+        var command = require(`../../../../${dir}/${file}`);
         if (!command) throw new ReferenceError("No command class found. use \"export command\"");
         commands.push({
             name: command.name,
