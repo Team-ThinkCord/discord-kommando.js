@@ -7,11 +7,17 @@ const HandleCommand = function(message) {
     var args = message.content.replace(config.prefix, "").split(" ");
     var command = args.shift();
     var hasKommando = false;
+    var index = 0;
+    var i = 0;
     config.commands.forEach(kmdo => {
-        if (kmdo.name === command) hasKommando = true;
+        if (kmdo.name === command) {
+            hasKommando = true;
+            index = i;
+        }
+        i++;
     });
     if (!hasKommando) return;
-    var kommando = require(`${config.directory}/${config.command[config.commands.indexOf(command)]}`);
+    var kommando = require(`${config.directory}/${config.command[index]}`);
     kommando.call(message, args);
 }
 
