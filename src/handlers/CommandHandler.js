@@ -17,7 +17,7 @@ const HandleCommand = function(message) {
         i++;
     });
     if (!hasKommando) return;
-    var kommando = require(`${config.directory}/${config.command[index]}`);
+    var kommando = require(`${config.directory}/${config.commands[index].file}`);
     kommando.call(message, args);
 }
 
