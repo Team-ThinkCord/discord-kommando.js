@@ -18,6 +18,8 @@ class Requirement {
     }
 }
 
+module.exports = Requirement;
+
 /*
  * 머리를 써보자..
  * 머리머리머리머리
