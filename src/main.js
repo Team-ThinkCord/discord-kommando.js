@@ -6,5 +6,6 @@ const Requirement = require('./setup/Requirement.js');
 module.exports = {
     setupKommando,
     Command,
-    CommandHandler
+    CommandHandler,
+    Requirement
 }
