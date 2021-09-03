@@ -1,7 +1,8 @@
 const fs = require('fs');
+const RequirementHandler = require('./requirementHandler.js');
 
 const HandleCommand = function(message) {
-    if (!fs.existsSync("kommando_config.json")) throw new ReferenceError("No config file found. Are you setted-up discord-kommando.js?");
+    if (!fs.existsSync("kommando_config.json")) throw new ReferenceError("No config file found. Are you sure you have set up discord-kommando?");
     const config = JSON.parse(fs.readFileSync("kommando_config.json"));
     if (!message.content.startsWith(config.prefix)) return;
     var args = message.content.replace(config.prefix, "").split(" ");
@@ -18,6 +19,7 @@ const HandleCommand = function(message) {
     });
     if (!hasKommando) return;
     var kommando = require(`../../../../${config.directory}/${config.commands[index].file}`);
+    if (!RequirementHandler(kommando, message, args)) return;
     kommando.call(message, args);
 }
 
