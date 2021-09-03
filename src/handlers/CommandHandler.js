@@ -1,7 +1,7 @@
 const fs = require('fs');
 const RequirementHandler = require('./requirementHandler.js');
 
-const HandleCommand = function(message) {
+const HandleCommand = async function(message) {
     if (!fs.existsSync("kommando_config.json")) throw new ReferenceError("No config file found. Are you sure you have set up discord-kommando?");
     const config = JSON.parse(fs.readFileSync("kommando_config.json"));
     if (!message.content.startsWith(config.prefix)) return;
@@ -14,6 +14,11 @@ const HandleCommand = function(message) {
         if (kmdo.name === command) {
             hasKommando = true;
             index = i;
+        } else if (kmdo.aliases) {
+            if (kmdo.aliases.indexOf(command) != -1) {
+                hasKommando = true;
+                index = i;
+            }
         }
         i++;
     });
