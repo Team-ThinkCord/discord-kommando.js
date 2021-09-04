@@ -3,7 +3,10 @@ const Discord = require('discord.js');
 const Configure = require('./Configure.js');
 
 const setupKommando = function(dir, prefix, options = {
-    messages: {}
+    messages: {
+        ERROR: null,
+        LOAD_MESSAGE: null
+    }
 }) {
     if (!options.disableMessages) console.log("Setting Kommando...");
     var directory = dir;
