@@ -2,7 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const Configure = require('./Configure.js');
 
-const setupKommando = function(dir, prefix, options) {
+const setupKommando = function(dir, prefix, options = {messages: {}}) {
     if (!options.disableMessages) console.log("Setting Kommando...");
     if (dir.endsWith("/")) directory = dir.substring(0, dir.length - 1);
     if (!fs.existsSync(dir)) throw ReferenceError(`Directory ${dir} was not found`);
