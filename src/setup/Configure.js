@@ -38,3 +38,5 @@ const Configure = function(dir, prefix, options) {
         messages
     }
 }
+
+module.exports = Configure;
