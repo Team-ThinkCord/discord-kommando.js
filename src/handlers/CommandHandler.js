@@ -25,7 +25,12 @@ const HandleCommand = async function(message) {
     if (!hasKommando) return;
     var kommando = require(`../../../../${config.directory}/${config.commands[index].file}`);
     if (!RequirementHandler(kommando, message, args)) return;
-    kommando.call(message, args);
+    try {
+        kommando.call(message, args);
+    } catch(err) {
+        console.error(err);
+        message.channel.send(config.messages.ERROR);
+    }
 }
 
 module.exports = HandleCommand;

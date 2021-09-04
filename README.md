@@ -20,7 +20,7 @@ Paste this code in your main file...
 
 ```js
 const Discord = require('discord.js');
-const kommando = require('discord-kommando.js');
+const kommando = require('djs-kommando.js');
 // Module importing
 
 const client = new Discord.Client();
@@ -44,7 +44,7 @@ and make your command file(The command file must have the extension 'js')
 Next, write this code in your command file...
 
 ```js
-const kommando = require('discord-kommando.js');
+const kommando = require('djs-kommando.js');
 
 const command = new kommando.Command({
     name: "ping",
