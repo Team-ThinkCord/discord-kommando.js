@@ -1,7 +1,7 @@
 const fs = require('fs');
 
-const Configure = function(dir, prefix, options) {
-    var [ commands, requirements, messages ] = [ [], [], {} ];
+const Configure = function(dir, prefix, options = {messages: {}}) {
+    var [ commands, requirements, messages, directory ] = [ [], [], {}, dir ];
     fs.readdirSync(dir).filter(f => f.endsWith(".js")).forEach(file => {
         var command = require(`../../../../${dir}/${file}`);
         commands.push({
