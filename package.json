@@ -1,6 +1,6 @@
 {
   "name": "discord-kommando.js",
-  "version": "1.1.0-ALPHA-DEV",
+  "version": "1.1.1",
   "description": "an Automatic command handler for discord.js",
   "main": "src/main.js",
   "scripts": {

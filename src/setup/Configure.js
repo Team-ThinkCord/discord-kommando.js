@@ -2,19 +2,19 @@ const fs = require('fs');
 const Requirement = require('./Requirement.js');
 const Command = require('./Command.js');
 const Button = require('./Button.js');
-var version = require('discord.js').version.split('');
+var version = require('../../../../node_modules/discord.js').version.split('');
 if (version.includes('(')) {
   version = version.join('').split('(').pop().split('');
 }
 version = parseInt(version[0] + version[1]);
 
-if (version != 12 | 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
+if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
 
 const Configure = function(dir, prefix, options) {
-    var [ commands, requirements, messages, directory, slash_commands, buttons ] = [ [], [], {}, dir ];
+    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus ] = [ [], [], {}, dir, [], [], [] ];
     fs.readdirSync(dir).filter(f => f.endsWith(".js")).forEach(file => {
         var command = require(`../../../../${dir}/${file}`);
-        if (!command instanceof Command) return throw new TypeError("Command is not exported or not command object");
+        if (!command instanceof Command) throw new TypeError("Command is not exported or not command object");
         commands.push({
             name: command.name,
             description: command.description,
@@ -28,7 +28,7 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/requirements`)) {
         fs.readdirSync(`${dir}/requirements`).filter(f => f.endsWith(".js")).forEach(file => {
             var requirement = require(`../../../../${dir}/requirements/${file}`);
-            if (!requirement instanceof Requirement) return throw new TypeError("Requirement is not exported or not requirement object.");
+            if (!requirement instanceof Requirement) throw new TypeError("Requirement is not exported or not requirement object.");
             requirements.push({
                 name: requirement.name,
                 file
@@ -41,7 +41,7 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/slash_commands`) && version == 13) {
         fs.readdirSync(`${dir}/slash_commands`).filter(f => f.endsWith(".js")).forEach(file => {
             var slcommand = require(`../../../../${dir}/slash_commands/${file}`);
-            if (!slcommand instanceof SlashCommand) return throw new TypeError("Button is not exported or not button object.");
+            if (!slcommand instanceof SlashCommand) throw new TypeError("Button is not exported or not button object.");
             slash_commands.push({
                 name: slcommand.name,
                 file
@@ -54,12 +54,12 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/buttons`)) {
         fs.readdirSync(`${dir}/buttons`).filter(f => f.endsWith(".js")).forEach(file => {
             var btn = require(`../../../../${dir}/buttons/${file}`);
-            if (!btn instanceof Button) return throw new TypeError("Slash command is not exported or not slash command object.");
+            if (!btn instanceof Button) throw new TypeError("Button is not exported or not slash command object.");
             buttons.push({
                 id: btn.id,
                 file
             });
-            if (!options.disableMessages) console.log(options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s", btn.name, file);
+            if (!options.disableMessages) console.log(options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s", btn.id, file);
         });
     }
     
@@ -69,7 +69,8 @@ const Configure = function(dir, prefix, options) {
         SLASH_COMMAND_LOAD_MESSAGE: options.messages.SLASH_COMMAND_LOAD_MESSAGE ?? "Loaded slash command %s from %s",
         REQUIREMENT_LOAD_MESSAGE: options.messages.REQUIREMRNT_LOAD_MESSAGE ?? "Loaded requirement %s from %s",
         BUTTON_LOAD_MESSAGE: options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s",
-        SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s"
+        SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s",
+        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK ?? "Ooooh! You clicked private button!"
     }
     
     return {

@@ -1,11 +1,10 @@
-const ButtonHandler = async function(btn) {
-    var version = require('discord.js').version.split('');
+const ButtonHandler = async (btn) => {
+    var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {
         version = version.join('').split('(').pop().split('');
     }
     version = parseInt(version[0] + version[1]);
-
-    if (version != 12 | 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
+    if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
     const config = JSON.parse(require('fs').readFileSync("kommando_config.json"));
     switch (version) {
         case 12:
@@ -21,7 +20,7 @@ const ButtonHandler = async function(btn) {
             if (!command) return;
             try {
                 btn.id = buttonid;
-                command.call(btn);
+                require(`../../../../${config.directory}/buttons/${command.file}`).call(btn);
             } catch(err) {
                 console.error(err);
                 btn.message.channel.send(config.messages.ERROR);
@@ -33,7 +32,7 @@ const ButtonHandler = async function(btn) {
             if (!btn.user) return;
             if (!btn.customId) throw new Error("Button listener is not djs v13 internal interaction handler");
             if (btn.customId.endsWith("__KOMMANDO_PRIVATE")) {
-                if (!btn.customId.startsWith(btn.clicker.user.id)) return config.messages.PRIVATEBUTTON_CLICK && await btn.reply.send(config.messages.PRIVATEBUTTON_CLICK, true);
+                if (!btn.customId.startsWith(btn.user.id)) return config.messages.PRIVATEBUTTON_CLICK && await btn.reply({ content: config.messages.PRIVATEBUTTON_CLICK, ephemeral: true });
                 buttonid = buttonid.replace("__KOMMANDO_PRIVATE", "").replace(btn.user.id + "_", "");
             }
             
@@ -41,7 +40,7 @@ const ButtonHandler = async function(btn) {
             if (!command) return;
             try {
                 btn.customId = buttonid;
-                command.call(btn);
+                require(`../../../../${config.directory}/buttons/${command.file}`).call(btn);
             } catch(err) {
                 console.error(err);
                 btn.message.channel.send(config.messages.ERROR);
@@ -49,3 +48,5 @@ const ButtonHandler = async function(btn) {
             break;
     }
 }
+
+module.exports = ButtonHandler;

@@ -16,7 +16,7 @@ const Configure = require('./Configure.js');
  * @param {string} [options.messages.BUTTON_LOAD_MESSAGE] Load message of button
  * @param {string} [options.messages.SELECTMENU_LOAD_MESSAGE] Load message of selectmenu
  */
-function setupKommando(dir, prefix, options = {messages: {}}) {
+function setupKommando(dir, prefix, options = { messages: { PRIVATEBUTTON_CLICK: false }}) {
     if (!options.disableMessages) console.log("Setting Kommando...");
     if (dir.endsWith("/")) directory = dir.substring(0, dir.length - 1);
     if (!fs.existsSync(dir)) throw ReferenceError(`Directory ${dir} was not found`);

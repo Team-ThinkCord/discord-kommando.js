@@ -1,5 +1,4 @@
-var Discord = require('discord.js');
-var disbut = require('discord-buttons');
+var Discord = require('../../../../node_modules/discord.js');
 
 /**
  * @param userid {string} A Discord.JS Message
@@ -11,37 +10,37 @@ var disbut = require('discord-buttons');
  * @param [url] {string} URL of button
  * @return {disbut.MessageButton | Discord.MessageButton}
  */
-function createPrivateButton(userid, id, label, style, emoji, disabled = false, url) {
-    var Discord = require('discord.js');
-    var disbut = require('discord-buttons');
+const createPrivateButton = function(userid, id, label, style, emoji, disabled = false, url) {
+    var Discord = require('../../../../node_modules/discord.js');
     
-    var version = require('discord.js').version.split('');
+    var version = Discord.version.split('');
     if (version.includes('(')) {
         version = version.join('').split('(').pop().split('');
     }
     version = parseInt(version[0] + version[1]);
-
-    if (version != 12 | 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
+    
+    if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
     switch (version) {
         case 12:
-            const button = new disbut.MessageButton()
+            var disbut = require('discord-buttons');
+            var btn = new disbut.MessageButton()
                 .setID(userid + "_" + id + "__KOMMANDO_PRIVATE")
                 .setLabel(label)
                 .setStyle(style)
                 .setDisabled(disabled);
-            button.style === "url" && button.setURL(url);
-            emoji && button.setEmoji(emoji);
-            return button;
+            btn.style === "url" && btn.setURL(url);
+            emoji && btn.setEmoji(emoji);
+            return btn;
             break;
         case 13:
-            const button = new Discord.MessageButton()
+            var btn = new Discord.MessageButton()
                 .setCustomId(userid + "_" + id + "__KOMMANDO_PRIVATE")
                 .setLabel(label)
                 .setStyle(style)
                 .setDisabled(disabled);
-            button.style === "LINK" && button.setURL(url);
-            emoji && button.setEmoji(emoji);
-            return button;
+            btn.style === "LINK" && btn.setURL(url);
+            emoji && btn.setEmoji(emoji);
+            return btn;
             break;
     }
 }
