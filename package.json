@@ -1,6 +1,6 @@
 {
   "name": "discord-kommando.js",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "an Automatic command handler for discord.js",
   "main": "src/main.js",
   "scripts": {
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/gooddltmdqls/discord-kommando.js#readme",
   "dependencies": {
+    "discord-buttons": "^4.0.0",
     "discord.js": "^12.5.3"
   },
   "devDependencies": {}

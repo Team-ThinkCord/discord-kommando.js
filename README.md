@@ -2,6 +2,8 @@
 an Automatic command handler for discord.js
 
 ## Manual
+[] = optional
+
 This module is the easiest to use
 
 But if you don't know how to use it properly, you can run into trouble
@@ -18,7 +20,7 @@ Slash Command: (commanddir)/slash_commands
 SelectMenu: (commanddir)/selectmenus
 
 ### kommando
-#### setupKommando(dir, prefix[, options])
+#### setupKommando
 ```js
 kommando.setupKommando(dir, prefix[, options]);
 ```
@@ -43,21 +45,21 @@ options = {
 }
 ```
 
-#### CommandHandler(message)
+#### CommandHandler
 ```js
 kommando.CommandHandler(message);
 ```
 
 message: Message object
 
-#### ButtonHandler(button)
+#### ButtonHandler
 ```js
 kommando.ButtonHandler(button);
 ```
 
 button: Button object([Discord.MessageButton](https://discord.js.org/#/docs/main/stable/class/MessageButton) or [disbut.MessageButton](https://github.com/discord-buttons/discord-buttons/blob/main/src/v12/Classes/MessageButton.js))
 
-#### createPrivateButton(userid, id, label, style[, emoji, disabled, url])
+#### createPrivateButton
 ```js
 kommando.createPrivateButton(userid, id, label, style[, emoji, disabled, url]);
 ```
@@ -74,29 +76,31 @@ emoji: Button emoji
 
 returns: [Discord.MessageButton](https://discord.js.org/#/docs/main/stable/class/MessageButton) or [disbut.MessageButton](https://github.com/discord-buttons/discord-buttons/blob/main/src/v12/Classes/MessageButton.js)
 
-### Command(options)
+### Command
 ```js
 new kommando.Command(options);
 ```
 
+options: 
+
 ```js
-options:
-    name: "Your command name",
-    description: "Your command description"[,
-    aliases: [ "Aliases" ],
-    require: [ "Requirements"]
+{
+    name: "name",
+    description: "description"[,
+    aliases: [ "aliase" ],
+    require: [ "YEAH" ]
     ]
-```
+}
 
 #### Methods
-##### handle(callback)
+##### handle
 ```js
 Command.handle(callback);
 ```
 
 callback: Function<message, arguments>
 
-##### call(message, arguments)
+##### call
 ```js
 Command.call(message, arguments);
 ```
@@ -105,7 +109,7 @@ message: Message object
 
 arguments: Args by spaces
 
-### Requirement(name)
+### Requirement
 ```js
 new kommando.Requirement(name);
 ```
@@ -113,7 +117,7 @@ new kommando.Requirement(name);
 name: Requirement name
 
 #### Methods
-##### handle(logic, callback)
+##### handle
 ```js
 Requirement.handle(logic, callback);
 ```
@@ -122,7 +126,7 @@ logic: Function<message, arguments>: boolean
 
 callback: Function<message, arguments>
 
-##### call(message, arguments)
+##### call
 ```js
 Requirement.call(message, arguments);
 ```
@@ -133,7 +137,7 @@ arguments: Args by spaces
 
 returns: ?boolean
 
-### Button(id)
+### Button
 ```js
 new kommando.Button(id);
 ```
@@ -141,7 +145,7 @@ new kommando.Button(id);
 id: Button id
 
 #### methods
-##### handle(callback)
+##### handle
 ```js
 Button.handle(callback);
 ```
