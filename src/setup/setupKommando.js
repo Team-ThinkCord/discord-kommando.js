@@ -15,6 +15,7 @@ const Configure = require('./Configure.js');
  * @param {string} [options.messages.REQUIREMENT_LOAD_MESSAGE] Load message of requirement
  * @param {string} [options.messages.BUTTON_LOAD_MESSAGE] Load message of button
  * @param {string} [options.messages.SELECTMENU_LOAD_MESSAGE] Load message of selectmenu
+ * @param {string} [options.messages.PRIVATEBUTTON_CLICK] This message will sended on user clicked private button
  */
 function setupKommando(dir, prefix, options = { messages: { PRIVATEBUTTON_CLICK: false }}) {
     if (!options.disableMessages) console.log("Setting Kommando...");

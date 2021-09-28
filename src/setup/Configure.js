@@ -70,7 +70,7 @@ const Configure = function(dir, prefix, options) {
         REQUIREMENT_LOAD_MESSAGE: options.messages.REQUIREMRNT_LOAD_MESSAGE ?? "Loaded requirement %s from %s",
         BUTTON_LOAD_MESSAGE: options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s",
         SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s",
-        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK ?? "Ooooh! You clicked private button!"
+        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK
     }
     
     return {
@@ -78,7 +78,7 @@ const Configure = function(dir, prefix, options) {
         prefix,
         directory,
         commands,
-        /* slash_commands, */
+        slash_commands,
         buttons,
         selectmenus,
         requirements,
