@@ -3,7 +3,7 @@
  * @param id {string} Menu identifier
  * @return {Discord.MessageSelectMenu | disbut.MessageMenu}
  */
-const createPrivateMenu(userid, id) {
+const createPrivateMenu = function(userid, id) {
     var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {
         version = version.join('').split('(').pop().split('');
