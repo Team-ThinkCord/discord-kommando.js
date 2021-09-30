@@ -91,6 +91,7 @@ options:
     require: [ "YEAH" ]
     ]
 }
+```
 
 #### Methods
 ##### handle
@@ -144,7 +145,7 @@ new kommando.Button(id);
 
 id: Button id
 
-#### methods
+#### Methods
 ##### handle
 ```js
 Button.handle(callback);
