@@ -1,3 +1,4 @@
+const { createPrivateMenu, createPrivateMenuOption } = require('./creators/privateMenuCreator');
 var version = require('../../../node_modules/discord.js').version.split('');
 if (version.includes('(')) {
   version = version.join('').split('(').pop().split('');
@@ -11,7 +12,11 @@ module.exports = {
     Command: require('./setup/Command'),
     Requirement: require('./setup/Requirement'),
     Button: require('./setup/Button'),
+    SelectMenu: require('./setup/SelectMenu'),
     ButtonHandler: require('./handlers/ButtonHandler'),
+    SelectMenuHandler: require('./handlers/SelectMenuHandler'),
     CommandHandler: require('./handlers/CommandHandler'),
-    createPrivateButton: require('./creators/privateButtonCreator')
+    createPrivateButton: require('./creators/privateButtonCreator'),
+    createPrivateMenu,
+    createPrivateMenuOption
 }

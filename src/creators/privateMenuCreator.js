@@ -34,3 +34,8 @@ const createPrivateMenuOption = function(user, value) {
         value: `${userid}_${id}__KOMMANDO_PRIVATE`
     }
 }
+
+module.exports = {
+    createPrivateMenu,
+    createPrivateMenuOption
+}
