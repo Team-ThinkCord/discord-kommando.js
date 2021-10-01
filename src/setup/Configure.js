@@ -83,7 +83,8 @@ const Configure = function(dir, prefix, options) {
         REQUIREMENT_LOAD_MESSAGE: options.messages.REQUIREMRNT_LOAD_MESSAGE ?? "Loaded requirement %s from %s",
         BUTTON_LOAD_MESSAGE: options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s",
         SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s",
-        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK
+        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK ?? false,
+        PRIVATEMENU_CLICK: options.messages.PRIVATEMENU_CLICK ?? false
     }
     
     return {
