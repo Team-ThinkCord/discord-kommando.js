@@ -19,3 +19,5 @@ class SelectMenu {
         this.callback(menu);
     }
 }
+
+module.exports = SelectMenu;
