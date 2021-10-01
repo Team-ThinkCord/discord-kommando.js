@@ -46,7 +46,7 @@ const Configure = function(dir, prefix, options) {
                 id: menu.id,
                 file
             });
-            if (!options.disableMessages) console.log(options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s", btn.id, file);
+            if (!options.disableMessages) console.log(options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s", menu.id, file);
         });
     }
     
