@@ -2,6 +2,7 @@ const fs = require('fs');
 const Requirement = require('./Requirement.js');
 const Command = require('./Command.js');
 const Button = require('./Button.js');
+const SelectMenu = require('./SelectMenu.js');
 var version = require('../../../../node_modules/discord.js').version.split('');
 if (version.includes('(')) {
   version = version.join('').split('(').pop().split('');
@@ -34,6 +35,18 @@ const Configure = function(dir, prefix, options) {
                 file
             });
             if (!options.disableMessages) console.log(options.messages.REQUIREMENT_LOAD_MESSAGE ?? "Loaded requirement %s from %s", requirement.name, file);
+        });
+    }
+    
+    if (fs.existsSync(`${dir}/selectmenus`)) {
+        fs.readdirSync(`${dir}/selectmenus`).filter(f => f.endsWith(".js")).forEach(file => {
+            var menu = require(`../../../../${dir}/selectmenus/${file}`);
+            if (!menu instanceof SelectMenu) throw new TypeError("SelectMenu is not exported or not slash command object.");
+            selectmenus.push({
+                id: menu.id,
+                file
+            });
+            if (!options.disableMessages) console.log(options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s", btn.id, file);
         });
     }
     
