@@ -11,7 +11,7 @@ const SelectMenuHandler = async (menu) => {
             var menuid = menu.id;
             if (!menu.clicker.user) return;
             if (menu.id.endsWith("__KOMMANDO_PRIVATE") || menu.values.find(value => value.endsWith("__KOMMANDO_PRIVATE"))) {
-                if (!menu.id.startsWith(btn.clicker.user.id) || !menu.values.find(value => value.startsWith(menu.clicker.user.id))) return config.messages.PRIVATEBUTTON_CLICK && await menu.reply.send(config.messages.PRIVATEBUTTON_CLICK, true);
+                if (!menu.id.startsWith(btn.clicker.user.id) || !menu.values.find(value => value.startsWith(menu.clicker.user.id))) return config.messages.PRIVATEMENU_CLICK && await menu.reply.send(config.messages.PRIVATEMENU_CLICK, true);
                 menuid = menuid.replace("__KOMMANDO_PRIVATE", "").replace(menu.clicker.user.id + "_", "");
             }
             
@@ -35,7 +35,7 @@ const SelectMenuHandler = async (menu) => {
             if (!menu.user) return;
             if (!menu.customId) throw new Error("SelectMenu listener is not djs v13 internal interaction handler");
             if (menu.customId.endsWith("__KOMMANDO_PRIVATE") || menu.values.find(value => value.endsWith("__KOMMANDO_PRIVATE"))) {
-                if (!menu.customId.startsWith(menu.user.id) || !menu.values.find(value => value.startsWith(menu.user.id))) return config.messages.PRIVATEBUTTON_CLICK && await menu.reply.send(config.messages.PRIVATEBUTTON_CLICK, true);
+                if (!menu.customId.startsWith(menu.user.id) || !menu.values.find(value => value.startsWith(menu.user.id))) return config.messages.PRIVATEMENU_CLICK && await menu.reply(config.messages.PRIVATEMENU_CLICK, true);
                 menuid = menuid.replace("__KOMMANDO_PRIVATE", "").replace(menu.user.id + "_", "");
             }
             
