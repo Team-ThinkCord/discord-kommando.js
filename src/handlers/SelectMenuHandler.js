@@ -11,7 +11,7 @@ const SelectMenuHandler = async (menu) => {
             var menuid = menu.id;
             if (!menu.clicker.user) return;
             if (menu.id.endsWith("__KOMMANDO_PRIVATE") || menu.values.find(value => value.endsWith("__KOMMANDO_PRIVATE"))) {
-                if (!menu.id.startsWith(menu.clicker.user.id) || !menu.values.find(value => value.startsWith(menu.clicker.user.id))) return config.messages.PRIVATEMENU_CLICK && await menu.reply.send(config.messages.PRIVATEMENU_CLICK, true);
+                if ((!menu.id.startsWith(menu.clicker.user.id) && menu.id.endsWith("__KOMMANDO_PRIVATE")) || (!menu.values.find(value => value.startsWith(menu.clicker.user.id) && menu.values.find(value => value.endsWith("__KOMMANDO_PRIVATE"))))) return config.messages.PRIVATEMENU_CLICK && await menu.reply.send(config.messages.PRIVATEMENU_CLICK, true);
                 menuid = menuid.replace("__KOMMANDO_PRIVATE", "").replace(menu.clicker.user.id + "_", "");
             }
             

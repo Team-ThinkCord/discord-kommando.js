@@ -3,6 +3,7 @@ const Requirement = require('./Requirement.js');
 const Command = require('./Command.js');
 const Button = require('./Button.js');
 const SelectMenu = require('./SelectMenu.js');
+const pluginSetup = require('./pluginSetup.js');
 var version = require('../../../../node_modules/discord.js').version.split('');
 if (version.includes('(')) {
   version = version.join('').split('(').pop().split('');
@@ -12,7 +13,7 @@ version = parseInt(version[0] + version[1]);
 if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
 
 const Configure = function(dir, prefix, options) {
-    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus ] = [ [], [], {}, dir, [], [], [] ];
+    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus, plugins ] = [ [], [], {}, dir, [], [], [], {} ];
     fs.readdirSync(dir).filter(f => f.endsWith(".js")).forEach(file => {
         var command = require(`../../../../${dir}/${file}`);
         if (!command instanceof Command) throw new TypeError("Command is not exported or not command object");
@@ -83,9 +84,15 @@ const Configure = function(dir, prefix, options) {
         REQUIREMENT_LOAD_MESSAGE: options.messages.REQUIREMRNT_LOAD_MESSAGE ?? "Loaded requirement %s from %s",
         BUTTON_LOAD_MESSAGE: options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s",
         SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s",
-        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK ?? false,
-        PRIVATEMENU_CLICK: options.messages.PRIVATEMENU_CLICK ?? false
+        PLUGIN_LOAD_MESSAGE: options.messages.PLUGIN_LOAD_MESSAGE ?? "Loaded plugin %s",
+        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK,
+        PRIVATEMENU_CLICK: options.messages.PRIVATEMENU_CLICK,
+        PLUGIN_LOAD_ERR: options.messages.PLUGIN_LOAD_ERR ?? "Unable to load plugin %s"
     }
+    
+    pls = pluginSetup(options.plugins, { messages });
+    if (!pls) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
+    else plugins = pls;
     
     return {
         note: "※ Do not remove this file ※",
