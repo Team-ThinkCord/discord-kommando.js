@@ -7,7 +7,7 @@ const pluginSetup = function(plugins, config) {
         if (!fs.existsSync(`node_modules/${pl}`)) console.log(config.messages.PLUGIN_LOAD_ERR, pl);
         else {
             return_var[pl] = require('../../../../node_modules/' + pl);
-            console.log(config.messages.PLUGIN_LOAD_MESSAGE, pl);
+            console.log(config.messages.PLUGIN_LOAD_MESSAGE, pl, retern_var[pl].perms.join(", ") ?? "none");
         }
     });
     return return_var;

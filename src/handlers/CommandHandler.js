@@ -1,8 +1,11 @@
 const fs = require('fs');
 const RequirementHandler = require('./requirementHandler.js');
+const MessageHandler = require('./nonCommandMessageHandler.js');
 
 const HandleCommand = async function(message) {
     if (!fs.existsSync("kommando_config.json")) throw new ReferenceError("No config file found. Are you sure you have set up discord-kommando?");
+    if (message.author.bot) return;
+    MessageHandler(message);
     const config = JSON.parse(fs.readFileSync("kommando_config.json"));
     if (!message.content.startsWith(config.prefix)) return;
     var args = message.content.replace(config.prefix, "").split(" ");

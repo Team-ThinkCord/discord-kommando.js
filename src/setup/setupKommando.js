@@ -18,7 +18,7 @@ const Configure = require('./Configure.js');
  * @param {string} [options.messages.PLUGIN_LOAD_MESSAGE] Load message of plugin
  * @param {string} [options.messages.PRIVATEBUTTON_CLICK] This message will sended on user clicked private button
  * @param {string} [options.messages.PLUGIN_LOAD_ERR] This message will sended on failed to load plugin
- * @param {string[]} [options.plugins] Array of plugins based on discord-kommando-plugins
+ * @param {string[]} [options.plugins] Array of plugins based on discord-kommando.js-plugins
  */
 function setupKommando(dir, prefix, options = { messages: {}, plugins: []}) {
     if (!options.disableMessages) console.log("Setting Kommando...");
