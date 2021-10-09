@@ -103,7 +103,8 @@ const Configure = function(dir, prefix, options) {
         buttons,
         selectmenus,
         requirements,
-        messages
+        messages,
+        plugins
     }
 }
 
