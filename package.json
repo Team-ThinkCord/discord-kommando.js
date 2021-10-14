@@ -1,6 +1,6 @@
 {
   "name": "discord-kommando.js",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "an Automatic command handler for discord.js",
   "main": "src/main.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gooddltmdqls/discord-kommando.js.git"
+    "url": "git+https://github.com/Team-ThinkCord/discord-kommando.js.git"
   },
   "keywords": [
     "discord.js",
@@ -17,9 +17,9 @@
   "author": "Icetang0123, Commandblock070",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/gooddltmdqls/discord-kommando.js/issues"
+    "url": "https://github.com/Team-ThinkCord/discord-kommando.js/issues"
   },
-  "homepage": "https://github.com/gooddltmdqls/discord-kommando.js#readme",
+  "homepage": "https://github.com/Team-ThinkCord/discord-kommando.js#readme",
   "dependencies": {
     "discord-buttons": "^4.0.0",
     "discord.js": "^12.5.3"

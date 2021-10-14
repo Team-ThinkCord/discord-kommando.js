@@ -17,6 +17,7 @@ class Button {
     // @param btn {object} A button object
     call(btn) {
         this.callback(btn);
+        return this;
     }
 }
 

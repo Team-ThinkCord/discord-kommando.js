@@ -22,11 +22,13 @@ const SelectMenuHandler = async (menu) => {
                 i = 0;
                 for (value of menu.values) {
                     menu.values[i] = value.replace("__KOMMANDO_PRIVATE", "").replace(menu.clicker.user.id + "_", "");
+                    i++;
                 }
                 require(`../../../../${config.directory}/selectmenus/${command.file}`).call(menu);
             } catch(err) {
                 console.error(err);
                 menu.message.channel.send(config.messages.ERROR);
+                require('./ErrorHandler.js')(err, menu.client);
             }
             break;
         case 13:
@@ -37,6 +39,7 @@ const SelectMenuHandler = async (menu) => {
             if (menu.customId.endsWith("__KOMMANDO_PRIVATE") || menu.values.find(value => value.endsWith("__KOMMANDO_PRIVATE"))) {
                 if (!menu.customId.startsWith(menu.user.id) || !menu.values.find(value => value.startsWith(menu.user.id))) return config.messages.PRIVATEMENU_CLICK && await menu.reply(config.messages.PRIVATEMENU_CLICK, true);
                 menuid = menuid.replace("__KOMMANDO_PRIVATE", "").replace(menu.user.id + "_", "");
+                i++;
             }
             
             var command = config.selectmenus.find(me => me.id === menuid);
@@ -51,6 +54,7 @@ const SelectMenuHandler = async (menu) => {
             } catch(err) {
                 console.error(err);
                 menu.message.channel.send(config.messages.ERROR);
+                require('./ErrorHandler.js')(err, menu.client);
             }
             break;
     }

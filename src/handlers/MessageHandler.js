@@ -1,8 +1,14 @@
 const MessageHandler = function(msg) {
     const config = JSON.parse(require('fs').readFileSync("kommando_config.json"));
-    const plugins = config.plugins;
+    const plugins = Object.values(config.plugins);
     plugins.forEach(plugin => {
-        if (plugin.perms.find(perm => perm === "msg")) require(`../../../../node_modules/${plugin}`).emit("messageCreate", msg);
+        try {
+            if (plugin.perms.find(perm => perm === "msg")) require(`../../../../node_modules/${plugin}`).emit("messageCreate", msg);
+        } catch {
+            console.error(err);
+            msg.channel.send(config.messages.ERROR);
+            require('./ErrorHandler.js')(err, msg.client);
+        }
     });
 }
 

@@ -24,6 +24,7 @@ const ButtonHandler = async (btn) => {
             } catch(err) {
                 console.error(err);
                 btn.message.channel.send(config.messages.ERROR);
+                require('./ErrorHandler.js')(err, btn.client);
             }
             break;
         case 13:
@@ -44,6 +45,7 @@ const ButtonHandler = async (btn) => {
             } catch(err) {
                 console.error(err);
                 btn.message.channel.send(config.messages.ERROR);
+                require('./ErrorHandler.js')(err, btn.client);
             }
             break;
     }

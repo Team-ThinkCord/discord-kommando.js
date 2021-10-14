@@ -22,6 +22,7 @@ class Command {
     
     call(msg, args) {
         this.callback(msg, args);
+        return this;
     }
 }
 

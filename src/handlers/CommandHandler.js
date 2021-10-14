@@ -1,6 +1,6 @@
 const fs = require('fs');
 const RequirementHandler = require('./requirementHandler.js');
-const MessageHandler = require('./nonCommandMessageHandler.js');
+const MessageHandler = require('./MessageHandler.js');
 
 const HandleCommand = async function(message) {
     if (!fs.existsSync("kommando_config.json")) throw new ReferenceError("No config file found. Are you sure you have set up discord-kommando?");
@@ -33,6 +33,7 @@ const HandleCommand = async function(message) {
     } catch(err) {
         console.error(err);
         message.channel.send(config.messages.ERROR);
+        require('./ErrorHandler.js')(err, message.client);
     }
 }
 

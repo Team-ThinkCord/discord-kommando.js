@@ -1,16 +1,21 @@
 const pluginSetup = function(plugins, config) {
     const fs = require('fs');
-    var return_var = {}
+    var plugins_return = {
+        check: true
+    }
+    var config_return = {}
     if (!plugins.length) return true;
     if (!fs.existsSync("node_modules")) return false;
     plugins.forEach((pl) => {
-        if (!fs.existsSync(`node_modules/${pl}`)) console.log(config.messages.PLUGIN_LOAD_ERR, pl);
+        var plugin = pl.toLowerCase();
+        if (!fs.existsSync(`node_modules/${plugin}`)) console.log(config.messages.PLUGIN_LOAD_ERR, pl);
         else {
-            return_var[pl] = require('../../../../node_modules/' + pl);
-            console.log(config.messages.PLUGIN_LOAD_MESSAGE, pl, return_var[pl].perms.join(", ") ?? "none");
+            plugins_return[plugin] = require('../../../../node_modules/' + plugin);
+            config_return[plugin] = plugins_return[plugin].defaultConfig;
+            console.log(config.messages.PLUGIN_LOAD_MESSAGE, plugin, plugins_return[plugin].perms.join(", ") ?? "none");
         }
     });
-    return return_var;
+    return [ plugins_return, config_return ];
 };
 
 module.exports = pluginSetup;

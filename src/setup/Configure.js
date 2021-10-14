@@ -13,7 +13,7 @@ version = parseInt(version[0] + version[1]);
 if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
 
 const Configure = function(dir, prefix, options) {
-    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus, plugins ] = [ [], [], {}, dir, [], [], [], {} ];
+    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus, plugins, pluginConfigs ] = [ [], [], {}, dir, [], [], [], {} ];
     fs.readdirSync(dir).filter(f => f.endsWith(".js")).forEach(file => {
         var command = require(`../../../../${dir}/${file}`);
         if (!command instanceof Command) throw new TypeError("Command is not exported or not command object");
@@ -91,8 +91,9 @@ const Configure = function(dir, prefix, options) {
     }
     
     pls = pluginSetup(options.plugins, { messages });
-    if (!pls) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
-    else plugins = pls;
+    if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
+    else plugins = pls[0];
+    if (plugins.check) pluginConfigs = pls[1];
     
     return {
         note: "※ Do not remove this file ※",
@@ -104,7 +105,8 @@ const Configure = function(dir, prefix, options) {
         selectmenus,
         requirements,
         messages,
-        plugins
+        plugins,
+        pluginConfig
     }
 }
 
