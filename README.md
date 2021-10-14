@@ -8,6 +8,8 @@ This module is the easiest to use
 
 But if you don't know how to use it properly, you can run into trouble
 
+You must use module.exports for everything that uses discord-kommando.js except the main file
+
 ### Directories
 Command: (commanddir)
 
@@ -35,12 +37,14 @@ options: Kommando options
 options = {
     disableMessages: false,
     messages: {
+        ERROR: "An error occurred",
         COMMAND_LOAD_MESSAGE: "Loaded command %s from %s",
-        REQUIREMENT_LOAD_MESSAGE: "Loaded requirement %s from %s",
         SLASH_COMMAND_LOAD_MESSAGE: "Loaded slash command %s from %s",
+        REQUIREMENT_LOAD_MESSAGE: "Loaded requirement %s from %s",
         BUTTON_LOAD_MESSAGE: "Loaded button %s from %s",
         SELECTMENU_LOAD_MESSAGE: "Loaded selectmenu %s from %s",
-        PRIVATEBUTTON_CLICK: false
+        PLUGIN_LOAD_MESSAGE: "Loaded plugin %s (perms: %s)",
+        PLUGIN_LOAD_ERR: "Unable to load plugin %s"
     }
 }
 ```
@@ -58,6 +62,13 @@ kommando.ButtonHandler(button);
 ```
 
 button: Button object([Discord.MessageButton](https://discord.js.org/#/docs/main/stable/class/MessageButton) or [disbut.MessageButton](https://github.com/discord-buttons/discord-buttons/blob/main/src/v12/Classes/MessageButton.js))
+
+#### SelectMenuHandler
+```js
+kommando.SelectMenuHandler(menu);
+```
+
+menu: No explanation needed, right?
 
 #### createPrivateButton
 ```js
@@ -159,3 +170,25 @@ Button.call(button);
 ```
 
 button: Button object
+
+### SelectMenu
+```js
+new kommando.SelectMenu(id);
+```
+
+id: SelectMenu identifier for handle target
+
+#### Methods
+##### handle
+```js
+SelectMenu.handle(callback);
+```
+
+callback: Function<menu>
+
+##### call
+```js
+SelectMenu.call(menu);
+```
+
+menu: No explanation needed, right?
