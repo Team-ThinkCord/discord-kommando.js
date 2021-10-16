@@ -1,6 +1,5 @@
-const config = require('fs').readFileSync("kommando_config.json");
-
 const ErrorHandler = function(err, client) {
+    const config = require('fs').readFileSync("kommando_config.json");
     Object.values(config.plugins).forEach(pl => {
         if (!pl instanceof Boolean) {
             var plugin = require(`../../../${pl}`);
