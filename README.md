@@ -45,7 +45,9 @@ options = {
         SELECTMENU_LOAD_MESSAGE: "Loaded selectmenu %s from %s",
         PLUGIN_LOAD_MESSAGE: "Loaded plugin %s (perms: %s)",
         PLUGIN_LOAD_ERR: "Unable to load plugin %s"
-    }
+    },
+    plugins: [],
+    pluginConfig: {}
 }
 ```
 

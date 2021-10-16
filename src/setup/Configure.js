@@ -95,6 +95,7 @@ const Configure = function(dir, prefix, options) {
     else plugins = pls[0];
     if (plugins.check) pluginConfig = pls[1];
     Object.assign(pluginConfig, options.pluginConfig);
+    if (plugins.check) delete plugins.check;
     
     return {
         note: "※ Do not remove this file ※",
