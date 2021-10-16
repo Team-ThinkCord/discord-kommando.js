@@ -93,7 +93,8 @@ const Configure = function(dir, prefix, options) {
     pls = pluginSetup(options.plugins, { messages });
     if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
     else plugins = pls[0];
-    if (plugins.check) pluginConfigs = pls[1];
+    if (plugins.check) pluginConfig = pls[1];
+    Object.assign(pluginConfig, options.pluginConfig);
     
     return {
         note: "※ Do not remove this file ※",

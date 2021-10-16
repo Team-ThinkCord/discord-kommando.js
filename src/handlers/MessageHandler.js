@@ -4,7 +4,7 @@ const MessageHandler = function(msg) {
     plugins.forEach(plugin => {
         try {
             if (plugin.perms.find(perm => perm === "msg")) require(`../../../../node_modules/${plugin}`).emit("messageCreate", msg);
-        } catch {
+        } catch(err) {
             console.error(err);
             msg.channel.send(config.messages.ERROR);
             require('./ErrorHandler.js')(err, msg.client);
