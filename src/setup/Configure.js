@@ -90,12 +90,14 @@ const Configure = function(dir, prefix, options) {
         PLUGIN_LOAD_ERR: options.messages.PLUGIN_LOAD_ERR ?? "Unable to load plugin %s"
     }
     
-    pls = pluginSetup(options.plugins, { messages });
-    if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
-    else plugins = pls[0];
-    if (plugins.check) pluginConfig = pls[1];
-    Object.assign(pluginConfig, options.pluginConfig);
-    if (plugins.check) delete plugins.check;
+    if (options.plugins) {
+        pls = pluginSetup(options.plugins, { messages });
+        if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
+        else plugins = pls[0];
+        if (plugins.check) pluginConfig = pls[1];
+        Object.assign(pluginConfig, options.pluginConfig);
+        if (plugins.check) delete plugins.check;
+    }
     
     return {
         note: "※ Do not remove this file ※",

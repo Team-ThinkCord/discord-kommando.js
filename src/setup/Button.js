@@ -6,7 +6,7 @@ class Button {
     }
     
     /**
-     * @param callback {function} Button handler function<btn>
+     * @param callback {function} Button handler function
      * @return {Button} 
      */
     handle(callback) {

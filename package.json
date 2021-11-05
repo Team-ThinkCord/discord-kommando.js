@@ -1,10 +1,11 @@
 {
   "name": "discord-kommando.js",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "an Automatic command handler for discord.js",
   "main": "src/main.js",
   "scripts": {
-    "test": "node src/main.js"
+    "test": "node src/main.js",
+    "docs": "jsdoc -c jsdoc.json src/**/* --verbose"
   },
   "repository": {
     "type": "git",
@@ -21,8 +22,12 @@
   },
   "homepage": "https://github.com/Team-ThinkCord/discord-kommando.js#readme",
   "dependencies": {
+    "@supabase/jsdoc-template": "^0.2.0",
+    "clean-jsdoc-theme": "^3.2.10",
     "discord-buttons": "^4.0.0",
     "discord.js": "^12.5.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jsdoc-strip-async-await": "^0.1.0"
+  }
 }

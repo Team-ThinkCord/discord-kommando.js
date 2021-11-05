@@ -1,3 +1,4 @@
+// @param btn {object} Button object
 const ButtonHandler = async (btn) => {
     var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {

@@ -14,7 +14,10 @@ class SelectMenu {
         return this;
     }
     
-    // @param menu {object} A selectmenu object
+    /**
+     * @param menu {object} A selectmenu object
+     * @return {SelectMenu}
+     */
     call(menu) {
         this.callback(menu);
         return this;

@@ -33,9 +33,3 @@ class Requirement {
 }
 
 module.exports = Requirement;
-
-/*
- * 머리를 써보자..
- * 머리머리머리머리
- * 민머리 대머리 맨들맨들 빡빡이
-*/

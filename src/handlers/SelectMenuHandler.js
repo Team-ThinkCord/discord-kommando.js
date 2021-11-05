@@ -1,3 +1,4 @@
+// @param menu {object} SelectMenu object
 const SelectMenuHandler = async (menu) => {
     var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {
