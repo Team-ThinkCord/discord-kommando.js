@@ -13,7 +13,7 @@ version = parseInt(version[0] + version[1]);
 if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
 
 const Configure = function(dir, prefix, options) {
-    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus, plugins, pluginConfigs ] = [ [], [], {}, dir, [], [], [], {} ];
+    var [ commands, requirements, messages, directory, slash_commands, buttons, selectmenus, plugins, pluginConfig ] = [ [], [], {}, dir, [], [], [], {} ];
     fs.readdirSync(dir).filter(f => f.endsWith(".js")).forEach(file => {
         var command = require(`../../../../${dir}/${file}`);
         if (!command instanceof Command) throw new TypeError("Command is not exported or not command object");
