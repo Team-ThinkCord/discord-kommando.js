@@ -7,6 +7,8 @@ const Configure = require('./Configure.js');
  * @param {string} dir Directory of commands and requirements or etc...
  * @param {string} prefix Prefix for commands
  * @param {object} [options] Options for kommando
+ * @param {boolean} [options.disableBotFilter] Disable bot filter\
+ * @param {boolean} [options.disableCommandFilter] Disable command filter
  * @param {boolean} [options.disableMessages] Disable the messages
  * @param {object} [options.messages] Set messages for kommando
  * @param {string} [options.messages.ERROR] Set error message
@@ -24,7 +26,9 @@ function setupKommando(dir, prefix, options = { messages: {}, plugins: []}) {
     if (!options.disableMessages) console.log("Setting Kommando...");
     if (dir.endsWith("/")) directory = dir.substring(0, dir.length - 1);
     if (!fs.existsSync(dir)) throw ReferenceError(`Directory ${dir} was not found`);
-    fs.writeFileSync(`kommando_config.json`, JSON.stringify(Configure(dir, prefix, options), null, 2));
+    fs.writeFileSync(`kommando_config.konf`, JSON.stringify(Configure(dir, prefix, options), null, 2), {
+        encoding: 'utf8'
+    });
 }
 
 module.exports = setupKommando;

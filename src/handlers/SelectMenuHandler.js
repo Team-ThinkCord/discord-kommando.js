@@ -6,7 +6,7 @@ const SelectMenuHandler = async (menu) => {
     }
     version = parseInt(version[0] + version[1]);
     if (version != 12 && version != 13) throw new Error(`Unsupported version v${version}\nnpm i discord.js@12.5.3 \nnpm i discord.js@latest`);
-    const config = JSON.parse(require('fs').readFileSync("kommando_config.json"));
+    const config = JSON.parse(require('fs').readFileSync("kommando_config.konf"));
     switch (version) {
         case 12:
             var menuid = menu.id;

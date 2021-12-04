@@ -1,6 +1,6 @@
 // @param msg {object} Message object
 const MessageHandler = function(msg) {
-    const config = JSON.parse(require('fs').readFileSync("kommando_config.json"));
+    const config = JSON.parse(require('fs').readFileSync("kommando_config.konf"));
     const plugins = Object.values(config.plugins);
     plugins.forEach(plugin => {
         try {
