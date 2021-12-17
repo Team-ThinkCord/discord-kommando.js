@@ -4,6 +4,7 @@ const Command = require('./Command.js');
 const Button = require('./Button.js');
 const SelectMenu = require('./SelectMenu.js');
 const pluginSetup = require('./pluginSetup.js');
+const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 var version = require('../../../../node_modules/discord.js').version.split('');
 if (version.includes('(')) {
   version = version.join('').split('(').pop().split('');
@@ -95,7 +96,7 @@ const Configure = function(dir, prefix, options) {
         if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
         else plugins = pls[0];
         if (plugins.check) pluginConfig = pls[1];
-        Object.assign(pluginConfig, options.pluginConfig);
+        pluginConfig = mergeDefault(pluginConfig, options.pluginConfig);
         if (plugins.check) delete plugins.check;
     }
     
@@ -115,3 +116,15 @@ const Configure = function(dir, prefix, options) {
 }
 
 module.exports = Configure;
+
+function mergeDefault(def, given) {
+    if (!given) return def;
+    for (const key in def) {
+        if (!has(given, key) || given[key] === undefined) {
+            given[key] = def[key];
+        } else if (given[key] === Object(given[key])) {
+            given[key] = mergeDefault(def[key], given[key]);
+        }
+    }
+    return given;
+}
