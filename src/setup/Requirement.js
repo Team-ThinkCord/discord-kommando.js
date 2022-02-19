@@ -1,15 +1,15 @@
 const Discord = require('discord.js');
 
 class Requirement {
-    // @param name {string} Name of requirement
+    // @param {string} name Name of requirement
     constructor(name) {
         if (typeof name != "string") throw new TypeError("Name is string. not " + typeof name + ".");
         this.name = name;
     }
     
     /**
-     * @param logic {function} function(msg, args): boolean
-     * @param callback {function} if (!logic) callback(msg, args)
+     * @param {function} logic a function returns boolean
+     * @param {function} callback called at logic return false
      * @return {Requirement}
      */
     handle(logic, callback) {
@@ -19,9 +19,10 @@ class Requirement {
     }
     
     /**
-     * @param msg {Discord.Message} msg object
-     * @param args {string[]} args
+     * @param {Discord.Message} msg Discord message object (or extended)
+     * @param {string[]} args Command arguments
      * @return {boolean}
+     * @private
      */
     call(msg, args) {
         if (!this.logic(msg, args)) {

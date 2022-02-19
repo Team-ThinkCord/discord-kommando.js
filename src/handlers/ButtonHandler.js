@@ -1,4 +1,4 @@
-// @param btn {object} Button object
+// @param {object} btn Button object
 const ButtonHandler = async (btn) => {
     var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {
@@ -24,7 +24,7 @@ const ButtonHandler = async (btn) => {
                 require(`../../../../${config.directory}/buttons/${command.file}`).call(btn);
             } catch(err) {
                 console.error(err);
-                btn.message.channel.send(config.messages.ERROR);
+                if (!config.disableMessages) btn.message.channel.send(config.messages.ERROR);
                 require('./ErrorHandler.js')(err, btn.client);
             }
             break;
@@ -45,7 +45,7 @@ const ButtonHandler = async (btn) => {
                 require(`../../../../${config.directory}/buttons/${command.file}`).call(btn);
             } catch(err) {
                 console.error(err);
-                btn.message.channel.send(config.messages.ERROR);
+                if (!config.disableMessages) btn.message.channel.send(config.messages.ERROR);
                 require('./ErrorHandler.js')(err, btn.client);
             }
             break;

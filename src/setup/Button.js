@@ -1,12 +1,12 @@
 class Button {
-    // @param id {string} ID of button
+    // @param {string} id Button identifier for handle
     constructor(id) {
         if (typeof id != "string") throw new TypeError("ID is string. not " + typeof id + ".");
         this.id = id;
     }
     
     /**
-     * @param callback {function} Button handler function
+     * @param {function} callback Button handler function
      * @return {Button} 
      */
     handle(callback) {
@@ -14,7 +14,11 @@ class Button {
         return this;
     }
     
-    // @param btn {object} A button object
+    /**
+     * @param {object} btn A button object
+     * @return {Button}
+     * @private
+     */
     call(btn) {
         this.callback(btn);
         return this;

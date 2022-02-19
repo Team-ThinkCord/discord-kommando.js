@@ -29,7 +29,7 @@ const createPrivateMenu = function(userid, id) {
  * @param value {string} Value of option
  * @return {object}
  */
-const createPrivateMenuOption = function(user, value) {
+const createPrivateMenuOption = function(userid, value) {
     return {
         value: `${userid}_${id}__KOMMANDO_PRIVATE`
     }

@@ -6,7 +6,7 @@ class SelectMenu {
     }
     
     /**
-     * @param callback {function} SelectMenu handler function<menu>
+     * @param {function} callback SelectMenu handler function<menu>
      * @return {SelectMenu} 
      */
     handle(callback) {
@@ -15,8 +15,9 @@ class SelectMenu {
     }
     
     /**
-     * @param menu {object} A selectmenu object
+     * @param {object} menu A selectmenu object
      * @return {SelectMenu}
+     * @private
      */
     call(menu) {
         this.callback(menu);

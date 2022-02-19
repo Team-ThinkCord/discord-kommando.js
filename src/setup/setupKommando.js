@@ -19,11 +19,12 @@ const Configure = require('./Configure.js');
  * @param {string} [options.messages.PRIVATEBUTTON_CLICK] This message will sended on user clicked private button
  * @param {string} [options.messages.PLUGIN_LOAD_ERR] This message will sended on failed to load plugin
  * @param {string[]} [options.plugins] Array of plugins based on discord-kommando.js-plugins
+ * @param {object} [options.pluginConfig] Plugin confìgs if want
  */
 function setupKommando(dir, prefix, options = { messages: {}, plugins: []}) {
     if (!options.disableMessages) console.log("Setting Kommando...");
     if (dir.endsWith("/")) directory = dir.substring(0, dir.length - 1);
-    if (!fs.existsSync(dir)) throw ReferenceError(`Directory ${dir} was not found`);
+    if (!fs.existsSync(dir)) throw ReferenceError(`Couldn't find directory ${dir}`);
     fs.writeFileSync(`kommando_config.json`, JSON.stringify(Configure(dir, prefix, options), null, 2));
 }
 

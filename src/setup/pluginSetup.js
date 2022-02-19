@@ -4,8 +4,8 @@ const pluginSetup = function(plugins, config) {
         check: true
     }
     var config_return = {}
-    if (!plugins.length) return true;
-    if (!fs.existsSync("node_modules")) return false;
+    if (!plugins.length) return [ true, {} ];
+    if (!fs.existsSync("node_modules")) return [ false ];
     plugins.forEach((pl) => {
         var plugin = pl.toLowerCase();
         if (!fs.existsSync(`node_modules/${plugin}`)) console.log(config.messages.PLUGIN_LOAD_ERR, pl);

@@ -1,4 +1,4 @@
-// @param menu {object} SelectMenu object
+// @param {object} menu SelectMenu object
 const SelectMenuHandler = async (menu) => {
     var version = require('../../../../node_modules/discord.js').version.split('');
     if (version.includes('(')) {
@@ -28,7 +28,7 @@ const SelectMenuHandler = async (menu) => {
                 require(`../../../../${config.directory}/selectmenus/${command.file}`).call(menu);
             } catch(err) {
                 console.error(err);
-                menu.message.channel.send(config.messages.ERROR);
+                if (!config.disableMessages) menu.message.channel.send(config.messages.ERROR);
                 require('./ErrorHandler.js')(err, menu.client);
             }
             break;
@@ -54,7 +54,7 @@ const SelectMenuHandler = async (menu) => {
                 require(`../../../../${config.directory}/selectmenus/${command.file}`).call(menu);
             } catch(err) {
                 console.error(err);
-                menu.message.channel.send(config.messages.ERROR);
+                if (!config.disableMessages) menu.message.channel.send(config.messages.ERROR);
                 require('./ErrorHandler.js')(err, menu.client);
             }
             break;

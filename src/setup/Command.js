@@ -1,10 +1,10 @@
 class Command {
     /**
-     * @param options {object} Options for command
-     * @param options.name {string} Name of command
-     * @param options.description {string} Description of command
-     * @param [options.aliases] {string[]} Aliases for command
-     * @param [options.require] {string[]} Requirements of command
+     * @param {object} options Options for command
+     * @param {string} options.name Name of command
+     * @param {string} options.description Description of command
+     * @param {string[]} [options.aliases] Aliases for command
+     * @param {string[]} [options.require] Requirements of command
      */
     constructor(options) {
         if (!options.name || !options.description) throw new TypeError("A commamd must provide a name and description");
@@ -23,6 +23,7 @@ class Command {
     /**
      * @param msg {object} Message Object
      * @param args {string[]} Message arguments
+     * @private
      */
     call(msg, args) {
         this.callback(msg, args);

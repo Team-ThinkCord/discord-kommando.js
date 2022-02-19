@@ -43,7 +43,7 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/selectmenus`)) {
         fs.readdirSync(`${dir}/selectmenus`).filter(f => f.endsWith(".js")).forEach(file => {
             var menu = require(`../../../../${dir}/selectmenus/${file}`);
-            if (!menu instanceof SelectMenu) throw new TypeError("SelectMenu is not exported or not slash command object.");
+            if (!menu instanceof SelectMenu) throw new TypeError("SelectMenu is not exported or not selectmenu object.");
             selectmenus.push({
                 id: menu.id,
                 file
@@ -56,7 +56,7 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/slash_commands`) && version == 13) {
         fs.readdirSync(`${dir}/slash_commands`).filter(f => f.endsWith(".js")).forEach(file => {
             var slcommand = require(`../../../../${dir}/slash_commands/${file}`);
-            if (!slcommand instanceof SlashCommand) throw new TypeError("Button is not exported or not button object.");
+            if (!slcommand instanceof SlashCommand) throw new TypeError("Button is not exported or not slash command object.");
             slash_commands.push({
                 name: slcommand.name,
                 file
@@ -69,7 +69,7 @@ const Configure = function(dir, prefix, options) {
     if (fs.existsSync(`${dir}/buttons`)) {
         fs.readdirSync(`${dir}/buttons`).filter(f => f.endsWith(".js")).forEach(file => {
             var btn = require(`../../../../${dir}/buttons/${file}`);
-            if (!btn instanceof Button) throw new TypeError("Button is not exported or not slash command object.");
+            if (!btn instanceof Button) throw new TypeError("Button is not exported or not button object.");
             buttons.push({
                 id: btn.id,
                 file
@@ -78,26 +78,28 @@ const Configure = function(dir, prefix, options) {
         });
     }
     
-    messages = {
-        ERROR: options.messages.ERROR ?? "An error occurred",
-        COMMAND_LOAD_MESSAGE: options.messages.COMMAND_LOAD_MESSAGE ?? "Loaded command %s from %s",
-        SLASH_COMMAND_LOAD_MESSAGE: options.messages.SLASH_COMMAND_LOAD_MESSAGE ?? "Loaded slash command %s from %s",
-        REQUIREMENT_LOAD_MESSAGE: options.messages.REQUIREMRNT_LOAD_MESSAGE ?? "Loaded requirement %s from %s",
-        BUTTON_LOAD_MESSAGE: options.messages.BUTTON_LOAD_MESSAGE ?? "Loaded button %s from %s",
-        SELECTMENU_LOAD_MESSAGE: options.messages.SELECTMENU_LOAD_MESSAGE ?? "Loaded selectmenu %s from %s",
-        PLUGIN_LOAD_MESSAGE: options.messages.PLUGIN_LOAD_MESSAGE ?? "Loaded plugin %s (perms: %s)",
-        PRIVATEBUTTON_CLICK: options.messages.PRIVATEBUTTON_CLICK,
-        PRIVATEMENU_CLICK: options.messages.PRIVATEMENU_CLICK,
-        PLUGIN_LOAD_ERR: options.messages.PLUGIN_LOAD_ERR ?? "Unable to load plugin %s"
+    let messages = {
+        ERROR: "An error occurred",
+        COMMAND_LOAD_MESSAGE: "Loaded command %s from %s",
+        SLASH_COMMAND_LOAD_MESSAGE: "Loaded slash command %s from %s",
+        REQUIREMENT_LOAD_MESSAGE: "Loaded requirement %s from %s",
+        BUTTON_LOAD_MESSAGE: "Loaded button %s from %s",
+        SELECTMENU_LOAD_MESSAGE: "Loaded selectmenu %s from %s",
+        PLUGIN_LOAD_MESSAGE: "Loaded plugin %s (perms: %s)",
+        PRIVATEBUTTON_CLICK: undefined,
+        PRIVATEMENU_CLICK: undefined,
+        PLUGIN_LOAD_ERR: "Unable to load plugin %s"
     }
+    
+    messages = mergeDefault(messages, options.messages);
     
     if (options.plugins) {
         pls = pluginSetup(options.plugins, { messages });
         if (!pls[0]) console.log("discord-kommando.js having any problem on loading plugins. Check your project folder!");
         else plugins = pls[0];
-        if (plugins.check) pluginConfig = pls[1];
-        pluginConfig = mergeDefault(pluginConfig, options.pluginConfig);
-        if (plugins.check) delete plugins.check;
+        if (plugins?.check) pluginConfig = pls[1];
+        pluginConfig = mergeDefault(pluginConfig, options.pluginConfig ?? {});
+        if (plugins?.check) delete plugins.check;
     }
     
     return {
