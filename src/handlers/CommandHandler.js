@@ -13,7 +13,7 @@ const HandleCommand = async function(message) {
     let command = args.shift();
     var kommando = config.commands.find(kmdo => kmdo.name === command || (kmdo.aliases && kmdo.aliases.find(al => al == command)));
     if (!kommando) return;
-    else kommando = require(`${config.directory}/${kommando.file}`);
+    else kommando = require(`../../../../${config.directory}/${kommando.file}`);
     if (!RequirementHandler(kommando, message, args)) return;
     try {
         kommando.call(message, args);
