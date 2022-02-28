@@ -78,7 +78,7 @@ const Configure = function(dir, prefix, options) {
         });
     }
     
-    let messages = {
+    messages = {
         ERROR: "An error occurred",
         COMMAND_LOAD_MESSAGE: "Loaded command %s from %s",
         SLASH_COMMAND_LOAD_MESSAGE: "Loaded slash command %s from %s",
