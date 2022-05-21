@@ -1,4 +1,4 @@
-import { ChannelType } from 'discord-api-types';
+import { ChannelType } from 'discord-api-types/v9';
 import { CommandInteraction } from 'discord.js';
 import * as Builders from '@discordjs/builders';
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -28,6 +28,8 @@ export interface OptionData {
     choices?: Array<[ unknown, unknown ]>,
     autocomplete: boolean,
     required?: boolean,
+    minValue?: number,
+    maxValue?: number,
     channelTypes?: Array<typeof allowedChannelTypes[number]>,
     type: 'string' | 'integer' | 'number' | 'boolean' | 'mentionable' | 'channel' | 'role' | 'user'
 }
@@ -49,23 +51,26 @@ export type SlashCommandOptions =
     Builders.SlashCommandBooleanOption |
     Builders.SlashCommandMentionableOption |
     Builders.SlashCommandChannelOption |
-    Builders.SlashCommandRoleOption
+    Builders.SlashCommandRoleOption |
     Builders.SlashCommandUserOption;
 
 export class Command {
     public name: string;
     public description: string;
     public requires: string[];
+    public toJSON: typeof SlashCommandBuilder.prototype.toJSON;
     private data: SlashCommandBuilder;
-    private callback: (itr: CommandInteraction) => void;
+    private callbacks: { default: (itr: CommandInteraction) => void, [key: string]: (itr: CommandInteraction) => void }
     
     constructor(data: CommandData) {
         this.name = data.name;
         this.description = data.description;
         this.requires = data.requires ?? [];
-        this.callback = () => {}
+        this.callbacks = { default: () => {} };
         this.data = new SlashCommandBuilder();
         if (data.options) this.addOptions(data.options);
+
+        this.toJSON = this.data.toJSON;
         
         this.build();
     }
@@ -82,17 +87,20 @@ export class Command {
         let optionName = data.type.charAt(0).toUpperCase() + data.type.slice(1);
         let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
         
-        // @ts-expect-error
+        // @ts-ignore
         this.data[methodName](<T extends unknown>(option: T) => {
             let opt = (option as SlashCommandOptions)
                 .setName(data.name)
                 .setDescription(data.description)
                 .setRequired(data.required ?? false);
-                
-            // @ts-expect-error
-            data.choices?.length &&  opt.setChoices(data.choices); // @ts-expect-error
-            data.autocomplete != undefined && opt.setAutocomplete(data.autocomplete); // @ts-expect-error
-            data.channelTypes?.length && opt.addChannelTypes(data.channelTypes);
+            
+            // @ts-ignore
+            data.choices?.length &&  opt.setChoices(data.choices); // @ts-ignore
+            data.autocomplete != undefined && opt.setAutocomplete(data.autocomplete); // @ts-ignore
+            data.channelTypes?.length && opt.addChannelTypes(data.channelTypes); // @ts-ignore
+            data.minValue != undefined && opt.setMinValue(data.minValue); // @ts-ignore
+            data.maxValue != undefined && opt.setMaxValue(data.maxValue);
+
             return opt;
         });
         
@@ -105,14 +113,17 @@ export class Command {
         return this;
     }
     
-    handle(callback: (itr: CommandInteraction) => void): Command {
-        this.callback = callback;
+    handle(callback: (itr: CommandInteraction) => void, subCommand?: string): Command {
+        if (subCommand) this.callbacks[subCommand] = callback;
+
+        this.callbacks.default = callback;
         
         return this;
     }
     
     call(itr: CommandInteraction): Command {
-        this.callback(itr);
+        if (itr.options.getSubcommand()) this.callbacks[(itr.options.getSubcommandGroup().length ? itr.options.getSubcommandGroup() + " " : "") + itr.options.getSubcommand()]?.(itr);
+        this.callbacks.default(itr);
         
         return this;
     }
