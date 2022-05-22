@@ -49,7 +49,7 @@ export class KommandoClient extends Client {
 
         if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
             let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`);
-            for (let file of commandFiles) {
+            for (let file of requirementFiles) {
                 let requirement: Requirement = require(`../../../../${this.kommando.directory}/requirements/${file}`);
                 this.requirements.set(requirement.name, requirement);
             }
@@ -68,15 +68,23 @@ export class KommandoClient extends Client {
     }
     
     commandHandler(itr: CommandInteraction): void {
-        
+        try {
+            let promise: Promise<undefined | Command> | undefined = this.commands.get(itr.commandName)?.call(itr);
+
+            if (promise instanceof Promise) promise.catch(err => {
+                console.error(err);
+                this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+            });
+        } catch (err) {
+            console.error(err);
+            this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+        }
     }
 
     async login(token: string): Promise<string> {
-        super.login(token);
-
         this.restManager.setToken(token);
 
-        return token;
+        return await super.login(token);
     }
 }
 

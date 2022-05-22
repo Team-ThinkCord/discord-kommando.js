@@ -2,4 +2,4 @@
 an Automatic command handler for discord.js
 
 ## docs
-Documentation link
+[Documentation link](docs/index.html)

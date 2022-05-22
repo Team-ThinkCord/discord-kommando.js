@@ -1,5 +1,4 @@
 import { Awaitable, CommandInteraction } from "discord.js";
-import { Command } from ".";
 
 export class Requirement {
     public name: string;
@@ -11,7 +10,7 @@ export class Requirement {
         this.handler = async (): Promise<boolean> => true;
         this.whenelse = async () => {};
     }
-
+    
     handle(handler: Awaitable<(command: CommandInteraction) => Promise<boolean>>, whenelse: Awaitable<(command: CommandInteraction) => Promise<void>>) {
         this.handler = handler;
         this.whenelse = whenelse;
