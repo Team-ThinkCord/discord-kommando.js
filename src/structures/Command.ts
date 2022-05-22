@@ -2,6 +2,7 @@ import { ChannelType } from 'discord-api-types/v9';
 import { CommandInteraction } from 'discord.js';
 import * as Builders from '@discordjs/builders';
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { KommandoClient, Requirement } from '.';
 
 const allowedChannelTypes = [
   ChannelType.GuildText,	
@@ -57,18 +58,23 @@ export type SlashCommandOptions =
 export class Command {
     public name: string;
     public description: string;
-    public requires: string[];
+    public requires: Requirement[];
     public toJSON: typeof SlashCommandBuilder.prototype.toJSON;
+    private rawRequires: string[];
     private data: SlashCommandBuilder;
     private callbacks: { default: (itr: CommandInteraction) => void, [key: string]: (itr: CommandInteraction) => void }
+    private client?: KommandoClient;
     
     constructor(data: CommandData) {
         this.name = data.name;
         this.description = data.description;
-        this.requires = data.requires ?? [];
         this.callbacks = { default: () => {} };
         this.data = new SlashCommandBuilder();
         if (data.options) this.addOptions(data.options);
+
+        this.rawRequires = data.requires ?? [];
+
+        this.requires = [];
 
         this.toJSON = this.data.toJSON;
         
@@ -112,6 +118,14 @@ export class Command {
         
         return this;
     }
+
+    register(client: KommandoClient) {
+        this.client = client;
+
+        this.requires = this.rawRequires.map(requirement => client.requirements.get(requirement)!!);
+
+        return this;
+    }
     
     handle(callback: (itr: CommandInteraction) => void, subCommand?: string): Command {
         if (subCommand) this.callbacks[subCommand] = callback;
@@ -121,7 +135,17 @@ export class Command {
         return this;
     }
     
-    call(itr: CommandInteraction): Command {
+    async call(itr: CommandInteraction) {
+        if (this.requires.length) {
+            let results: Array<boolean> = [];
+
+            await this.requires.forEach(async requirement => {
+                results.push(await requirement.call(itr));
+            });
+
+            if (results.includes(false)) return;
+        }
+
         if (itr.options.getSubcommand()) this.callbacks[(itr.options.getSubcommandGroup().length ? itr.options.getSubcommandGroup() + " " : "") + itr.options.getSubcommand()]?.(itr);
         this.callbacks.default(itr);
         

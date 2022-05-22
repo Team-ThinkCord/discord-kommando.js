@@ -2,7 +2,7 @@ import { Client, Intents, CommandInteraction, Collection, ClientOptions } from '
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { Command } from '.';
+import { Command, Requirement } from '.';
 
 let has = <T extends {}>(o: T, k: string) => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -28,6 +28,7 @@ export interface IKommandoOptions {
 export class KommandoClient extends Client {
     public kommando: typeof KommandoOptions;
     public commands: Collection<string, Command>;
+    public requirements: Collection<string, Requirement>;
     public restManager: REST;
     
     constructor(options: IKommandoOptions, opts: ClientOptions = { intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}) {
@@ -37,12 +38,21 @@ export class KommandoClient extends Client {
         
         this.kommando = mergeDefault(KommandoOptions, options) as typeof KommandoOptions;
         this.commands = new Collection();
+        this.requirements = new Collection();
         this.restManager = new REST();
 
         let commandFiles = fs.readdirSync(this.kommando.directory);
         for (let file of commandFiles) {
-            let command = require(`../../../../${this.kommando.directory}/${file}`);
-            this.commands.set(command.name, command);
+            let command: Command = require(`../../../../${this.kommando.directory}/${file}`);
+            this.commands.set(command.name, command.register(this));
+        }
+
+        if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
+            let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`);
+            for (let file of commandFiles) {
+                let requirement: Requirement = require(`../../../../${this.kommando.directory}/requirements/${file}`);
+                this.requirements.set(requirement.name, requirement);
+            }
         }
 
         this.once("ready", this.registerCommands);

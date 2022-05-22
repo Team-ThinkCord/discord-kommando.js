@@ -1,23 +1,29 @@
 import { Awaitable, CommandInteraction } from "discord.js";
+import { Command } from ".";
 
 export class Requirement {
     public name: string;
-    public handler: Awaitable<(command: CommandInteraction) => boolean>;
-    public whenelse: Awaitable<(command: CommandInteraction) => void>;
+    public handler: Awaitable<(command: CommandInteraction) => Promise<boolean>>;
+    public whenelse: Awaitable<(command: CommandInteraction) => Promise<void>>;
 
     constructor(name: string) {
         this.name = name;
+        this.handler = async (): Promise<boolean> => true;
+        this.whenelse = async () => {};
     }
 
-    handle(handler: Awaitable<(command: CommandInteraction) => boolean>, whenelse: Awaitable<(command: CommandInteraction) => void>) {
+    handle(handler: Awaitable<(command: CommandInteraction) => Promise<boolean>>, whenelse: Awaitable<(command: CommandInteraction) => Promise<void>>) {
         this.handler = handler;
         this.whenelse = whenelse;
+
+        return this;
     }
 
     async call(command: CommandInteraction) {
         // @ts-ignore
-        if (!(await this.handler(command))) await this.whenelse(command);
+        let andjsrk = await this.handler(command); // @ts-ignore
+        if (!andjsrk) await this.whenelse(command);
 
-        return;
+        return andjsrk;
     }
 }
