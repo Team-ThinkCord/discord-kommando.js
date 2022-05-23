@@ -146,15 +146,16 @@ export class Command {
         let optionName = data.type.charAt(0).toUpperCase() + data.type.slice(1);
         let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
         
+
         // @ts-ignore
-        this.data[methodName](<T extends unknown>(option: T) => {
-            let opt = (option as SlashCommandOptions)
+        this.data[methodName]((option: SlashCommandOptions) => {
+            let opt = (option)
                 .setName(data.name)
                 .setDescription(data.description)
                 .setRequired(data.required ?? false);
             
             // @ts-ignore
-            data.choices?.length &&  opt.setChoices(data.choices); // @ts-ignore
+            data.choices?.length &&  opt.setChoices(data.choices.map(choice => [ { name: choice, value: choice }])); // @ts-ignore
             data.autocomplete != undefined && opt.setAutocomplete(data.autocomplete); // @ts-ignore
             data.channelTypes?.length && opt.addChannelTypes(data.channelTypes); // @ts-ignore
             data.minValue != undefined && opt.setMinValue(data.minValue); // @ts-ignore
