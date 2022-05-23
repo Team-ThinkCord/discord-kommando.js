@@ -4,6 +4,10 @@
   "description": "an Automatic command handler for discord.js",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
+  "exports": {
+    "import": "./esm.mjs",
+    "require": "./dist/main.js"
+  },
   "scripts": {
     "test": "echo **Error** No test specified.",
     "prepublishOnly": "tsc",
@@ -26,7 +30,7 @@
   "homepage": "https://github.com/Team-ThinkCord/discord-kommando.js#readme",
   "dependencies": {
     "@discordjs/rest": "^0.4.1",
-    "discord.js": ">=13"
+    "discord.js": "^13.7.0"
   },
   "devDependencies": {
     "@types/node": "^17.0.30",

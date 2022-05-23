@@ -1,8 +1,8 @@
-import { Client, Intents, CommandInteraction, Collection, ClientOptions } from 'discord.js';
+import {Client, Intents, CommandInteraction, Collection, ClientOptions, Interaction} from 'discord.js';
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { Command, Requirement } from '.';
+import { Command, Plugin, Requirement } from '.';
 
 let has = <T extends {}>(o: T, k: string) => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -11,34 +11,104 @@ const KommandoOptions = {
     messages: {
         ERROR: 'An error occurred.'
     },
+    plugins: [] as string[],
+    pluginConfigs: {},
     disableMessages: false,
     noAutoHandle: false
 }
 
 export interface IKommandoOptions {
-    /* plugins?: string[], */
-    directory: string,
+    /**
+     * The directory to look for handlers in.
+     *
+     * % = directory
+     * %: The directory to look for commands in.
+     * %/requirements: The directory to look for requirements in.
+     */
+    directory: string;
+
+    /**
+     * The messages
+     */
     messages?: {
+        /**
+         * The error message.
+         */
         ERROR?: string
-    },
-    disableMessages?: boolean,
-    noAutoHandle?: boolean
+    };
+
+    /**
+     * The plugins to load.
+     */
+    plugins?: string[];
+
+    /**
+     * The plugin configurations.
+     */
+    pluginConfigs?: {
+        /**
+         * Config by plugin name.
+         */
+        [pluginName: string]: any
+    };
+
+    /**
+     * Whether to disable the messages.
+     */
+    disableMessages?: boolean;
+
+    /**
+     * Whether to disable the auto-handling of commands.
+     */
+    noAutoHandle?: boolean;
 }
 
 export class KommandoClient extends Client {
+    /**
+     * The kommando options containing directory.
+     */
     public kommando: typeof KommandoOptions;
+
+    /**
+     * The client commands.
+     */
     public commands: Collection<string, Command>;
+
+    /**
+     * The client requirements.
+     */
     public requirements: Collection<string, Requirement>;
+
+    /**
+     * The client plugins.
+     */
+    public plugins: Plugin[];
+
+    /**
+     * The client rest api manager.
+     */
     public restManager: REST;
-    
+
+    /**
+     * Create new kommando client instance.
+     * @param options The kommando options.
+     * @param opts The client options.
+     */
     constructor(options: IKommandoOptions, opts: ClientOptions = { intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}) {
         super(mergeDefault({ intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}, opts));
         
-        if (!has(options, 'directory')) throw new TypeError('Please provide the directory.');
+        if (!options || !has(options, 'directory')) throw new TypeError('Please provide the directory.');
         
-        this.kommando = mergeDefault(KommandoOptions, options) as typeof KommandoOptions;
+        this.kommando = mergeDefault(KommandoOptions, options);
         this.commands = new Collection();
         this.requirements = new Collection();
+
+        this.plugins = [];
+
+        this.kommando.plugins.forEach(plugin => {
+            this.plugins.push((require(plugin.toLowerCase()) as Plugin).register(this));
+        });
+
         this.restManager = new REST();
 
         let commandFiles = fs.readdirSync(this.kommando.directory);
@@ -56,18 +126,32 @@ export class KommandoClient extends Client {
         }
 
         this.once("ready", this.registerCommands);
+
+        if (!this.kommando.noAutoHandle) {
+            this.on("interactionCreate", this.commandHandler);
+        }
     }
 
+    /**
+     * Register the commands.
+     */
     async registerCommands() {
         let commands = this.commands.map(c => c.toJSON());
         
-        this.restManager.put(
+        await this.restManager.put(
             Routes.applicationCommands(this.user!!.id),
             { body: commands }
         );
     }
-    
-    commandHandler(itr: CommandInteraction): void {
+
+    /**
+     * Handle the application command.
+     *
+     * @param itr The command.
+     */
+    commandHandler(itr: Interaction): void {
+        if (!itr.isCommand()) return;
+
         try {
             let promise: Promise<undefined | Command> | undefined = this.commands.get(itr.commandName)?.call(itr);
 
@@ -81,6 +165,11 @@ export class KommandoClient extends Client {
         }
     }
 
+    /**
+     * Login to bot.
+     *
+     * @param token The token to login.
+     */
     async login(token: string): Promise<string> {
         this.restManager.setToken(token);
 
@@ -88,7 +177,7 @@ export class KommandoClient extends Client {
     }
 }
 
-function mergeDefault<T extends {}>(def: T, given: T): typeof def {
+function mergeDefault<T extends {}>(def: T, given: { [key: string]: any }): typeof def {
     if (!given) return def;
     
     for (const key in def) {
@@ -99,5 +188,5 @@ function mergeDefault<T extends {}>(def: T, given: T): typeof def {
         }
     }
     
-    return given;
+    return given as typeof def;
 }
