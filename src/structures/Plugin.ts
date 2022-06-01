@@ -1,5 +1,5 @@
 import { Command, KommandoClient } from ".";
-import { ClientEvents, Collection } from "discord.js";
+import { ClientEvents, Collection, Util } from "discord.js";
 
 export interface PluginConfig {
     /**
@@ -21,6 +21,11 @@ export interface PluginConfig {
      * The version of the plugin.
      */
     version: string;
+
+    /**
+     * The default config
+     */
+    defaultConfig: any;
 }
 
 /**
@@ -60,6 +65,11 @@ export class Plugin {
     };
 
     /**
+     * The config provided by the user.
+     */
+    public config: any;
+
+    /**
      * Creates an instance of Plugin.
      * @param {PluginConfig} config The config of the plugin.
      * @memberof Plugin
@@ -71,6 +81,7 @@ export class Plugin {
         this.version = config.version;
         this.commands = new Collection<string, Command>();
         this.listeners = {};
+        this.config = config.defaultConfig ?? {}
     }
 
     /**
@@ -121,6 +132,12 @@ export class Plugin {
 
             for (let listener of e) {
                 client.on(event, listener);
+            }
+        }
+
+        for (const configKey in client.kommando.pluginConfigs) {
+            if (configKey === this.name) {
+                this.config = Util.mergeDefault(this.config, client.kommando.pluginConfigs[configKey]);
             }
         }
 

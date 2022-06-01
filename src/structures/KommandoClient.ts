@@ -1,4 +1,4 @@
-import { Client, Intents, Collection, ClientOptions, Interaction } from 'discord.js';
+import { Client, Intents, Collection, ClientOptions, Interaction, Util } from 'discord.js';
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
@@ -12,7 +12,7 @@ const KommandoOptions = {
         ERROR: 'An error occurred.'
     },
     plugins: [] as string[],
-    pluginConfigs: {},
+    pluginConfigs: {} as { [pluginName: string]: any},
     disableMessages: false,
     noAutoHandle: false
 }
@@ -95,11 +95,11 @@ export class KommandoClient extends Client {
      * @param opts The client options.
      */
     constructor(options: IKommandoOptions, opts: ClientOptions = { intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}) {
-        super(mergeDefault({ intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}, opts));
+        super(<ClientOptions>Util.mergeDefault({ intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}, opts));
         
         if (!options || !has(options, 'directory')) throw new TypeError('Please provide the directory.');
         
-        this.kommando = mergeDefault(KommandoOptions, options);
+        this.kommando = <typeof KommandoOptions>Util.mergeDefault(KommandoOptions, options);
         this.commands = new Collection();
         this.requirements = new Collection();
 
@@ -178,18 +178,4 @@ export class KommandoClient extends Client {
 
         return await super.login(token);
     }
-}
-
-function mergeDefault<T extends {}>(def: T, given: { [key: string]: any }): typeof def {
-    if (!given) return def;
-    
-    for (const key in def) {
-        if (!has(given, key) || given[key] === undefined) {
-            given[key] = def[key];
-        } else if (given[key] === Object(given[key])) {
-            given[key] = mergeDefault(def[key], given[key]);
-        }
-    }
-    
-    return given as typeof def;
 }
