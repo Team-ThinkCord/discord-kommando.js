@@ -12,7 +12,7 @@ export class Requirement {
     /**
      * The handler of the requirement.
      */
-    public handler: Awaitable<(command: CommandInteraction) => Promise<boolean>>;
+    public handler: Awaitable<(command: CommandInteraction) => Promise<boolean>> | boolean;
 
     /**
      * Called when return is false.

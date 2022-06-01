@@ -32,7 +32,7 @@ export interface CommandData {
 export interface OptionData {
     name: string,
     description: string,
-    choices?: Array<[ unknown, unknown ]>,
+    choices?: unknown[],
     autocomplete: boolean,
     required?: boolean,
     minValue?: number,
@@ -84,7 +84,7 @@ export class Command {
     /**
      * The requirements of the command.
      */
-    public requires: Requirement[];
+    public requires: Array<Requirement | undefined>;
 
     /**
      * Make this class to API application command.
@@ -94,7 +94,7 @@ export class Command {
     /**
      * The raw requirements before loading
      */
-    private rawRequires: string[];
+    private readonly rawRequires: string[];
 
     /**
      * The data of the command.
@@ -122,7 +122,7 @@ export class Command {
 
         this.requires = [];
 
-        this.toJSON = this.data.toJSON;
+        this.toJSON = this.data.toJSON.bind(this.data);
         
         this.build();
     }
@@ -153,9 +153,9 @@ export class Command {
                 .setName(data.name)
                 .setDescription(data.description)
                 .setRequired(data.required ?? false);
-            
+
             // @ts-ignore
-            data.choices?.length &&  opt.setChoices(data.choices.map(choice => [ { name: choice, value: choice }])); // @ts-ignore
+            data.choices?.length && opt.addChoices(...data.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
             data.autocomplete != undefined && opt.setAutocomplete(data.autocomplete); // @ts-ignore
             data.channelTypes?.length && opt.addChannelTypes(data.channelTypes); // @ts-ignore
             data.minValue != undefined && opt.setMinValue(data.minValue); // @ts-ignore
@@ -184,7 +184,11 @@ export class Command {
     register(client: KommandoClient) {
         this.client = client;
 
-        this.requires = this.rawRequires.map(requirement => client.requirements.get(requirement)!!);
+        this.requires = this.rawRequires.map(requirement => client.requirements.get(requirement));
+
+        this.requires.forEach((requirement, i) => { // Checks requirement is defined
+            if (!requirement) throw new ReferenceError(`Requirement ${this.rawRequires[i]} not found in command ${this.name}`);
+        });
 
         return this;
     }
@@ -239,14 +243,16 @@ export class Command {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                results.push(await requirement.call(itr));
+                console.log(requirement);
+
+                results.push(await requirement!!.call(itr));
             }
 
             if (results.includes(false)) return;
         }
 
-        if (itr.options.getSubcommand()) this.callbacks[(itr.options.getSubcommandGroup().length ? itr.options.getSubcommandGroup() + " " : "") + itr.options.getSubcommand()]?.(itr);
-        this.callbacks.default(itr);
+        if (itr.options.getSubcommand(false)) this.callbacks[(itr.options.getSubcommandGroup(false)?.length ? itr.options.getSubcommandGroup() + " " : "") + itr.options.getSubcommand()]?.(itr);
+        else this.callbacks.default(itr);
         
         return this;
     }

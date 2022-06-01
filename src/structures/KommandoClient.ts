@@ -1,4 +1,4 @@
-import {Client, Intents, CommandInteraction, Collection, ClientOptions, Interaction} from 'discord.js';
+import { Client, Intents, Collection, ClientOptions, Interaction } from 'discord.js';
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
@@ -111,18 +111,20 @@ export class KommandoClient extends Client {
 
         this.restManager = new REST();
 
-        let commandFiles = fs.readdirSync(this.kommando.directory);
-        for (let file of commandFiles) {
-            let command: Command = require(`../../../../${this.kommando.directory}/${file}`);
-            this.commands.set(command.name, command.register(this));
-        }
-
         if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
-            let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`);
+            let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`).filter(file => file.endsWith('.js'));
             for (let file of requirementFiles) {
                 let requirement: Requirement = require(`../../../../${this.kommando.directory}/requirements/${file}`);
                 this.requirements.set(requirement.name, requirement);
+
+                console.log(this.requirements)
             }
+        }
+
+        let commandFiles = fs.readdirSync(this.kommando.directory).filter(file => file.endsWith('.js'));
+        for (let file of commandFiles) {
+            let command: Command = require(`../../../../${this.kommando.directory}/${file}`);
+            this.commands.set(command.name, command.register(this));
         }
 
         this.once("ready", this.registerCommands);
@@ -136,7 +138,8 @@ export class KommandoClient extends Client {
      * Register the commands.
      */
     async registerCommands() {
-        let commands = this.commands.map(c => c.toJSON());
+        let commands: any[] = [];
+        this.commands.map(c => commands.push(c.toJSON()));
         
         await this.restManager.put(
             Routes.applicationCommands(this.user!!.id),

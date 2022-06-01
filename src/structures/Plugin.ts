@@ -56,7 +56,7 @@ export class Plugin {
      * The events will load into the plugin.
      */
     public listeners: {
-        [key in keyof ClientEvents]?: (...args: any[]) => void[]
+        [key in keyof ClientEvents]?: ((...args: any[]) => void)[]
     };
 
     /**
@@ -113,13 +113,18 @@ export class Plugin {
         }
 
         for (let event in this.listeners) {
-            // @ts-ignore
-            for (let listener of this.listeners[event]) {
+            let { listeners } = this;
+
+            let eventName: keyof typeof listeners = event as keyof typeof listeners;
+
+            let e: ((...args: any[]) => void)[] = listeners[eventName]!!;
+
+            for (let listener of e) {
                 client.on(event, listener);
             }
         }
 
-        console.log(`Registered ${this.name} v${this.version} by ${this.authors.join(", ")}`);
+        console.log(`Registered plugin ${this.name} v${this.version} by ${this.authors.join(", ")}`);
 
         return this;
     }
