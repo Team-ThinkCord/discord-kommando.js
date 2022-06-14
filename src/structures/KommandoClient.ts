@@ -13,6 +13,10 @@ const KommandoOptions = {
     },
     plugins: [] as string[],
     pluginConfigs: {} as { [pluginName: string]: any},
+    test: {
+        enable: false,
+        guild: null
+    },
     disableMessages: false,
     noAutoHandle: false
 }
@@ -50,6 +54,21 @@ export interface IKommandoOptions {
          * Config by plugin name.
          */
         [pluginName: string]: any
+    };
+
+    /**
+     * The test mod configurations.
+     */
+    test?: {
+        /**
+         * true for enable test mode.
+         */
+        enable: boolean,
+
+        /**
+         * The test guild id.
+         */
+        guild: null | string
     };
 
     /**
@@ -140,11 +159,22 @@ export class KommandoClient extends Client {
     async registerCommands() {
         let commands: any[] = [];
         this.commands.map(c => commands.push(c.toJSON()));
-        
-        await this.restManager.put(
-            Routes.applicationCommands(this.user!!.id),
-            { body: commands }
-        );
+
+        if (this.kommando.test.enable) {
+            if (this.kommando.test.guild == null) throw new TypeError("[options.test.guild] Expected string. but got null instead.");
+
+            await this.restManager.put(
+                Routes.applicationGuildCommands(this.user!!.id, this.kommando.test.guild),
+                { body: commands }
+            );
+        } else {
+            await this.restManager.put(
+                Routes.applicationCommands(this.user!!.id),
+                { body: commands }
+            );
+        }
+
+        return;
     }
 
     /**
