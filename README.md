@@ -2,4 +2,4 @@
 an Automatic command handler for discord.js
 
 ## docs
-[Documentation link](docs/index.html)
+[Documentation link](https://team-thinkcord.github.io/discord-kommando.js/)
