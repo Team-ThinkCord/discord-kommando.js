@@ -1,4 +1,15 @@
-import { Awaitable, CommandInteraction } from "discord.js";
+import { Awaitable, CommandInteraction, Interaction, MessageButton, MessageSelectMenu, ModalSubmitInteraction } from "discord.js";
+
+/**
+ * The requirement target.
+ */
+export enum RequirementTarget {
+    ANY,
+    COMMAND,
+    BUTTON,
+    SELECTMENU,
+    MODAL
+}
 
 /**
  * A requirement for a command to be executed.
@@ -10,21 +21,28 @@ export class Requirement {
     public name: string;
 
     /**
+     * The target to handle the requirement.
+     */
+    public target: RequirementTarget;
+
+    /**
      * The handler of the requirement.
      */
-    public handler: Awaitable<(command: CommandInteraction) => Promise<boolean>> | boolean;
+    public handler: Awaitable<(itr: Interaction) => Promise<boolean>>;
 
     /**
      * Called when return is false.
      */
-    public whenelse: Awaitable<(command: CommandInteraction) => Promise<void>>;
+    public whenelse: Awaitable<(itr: Interaction) => Promise<void>>;
 
     /**
      * Creates a new requirement.
      * @param name The name of the requirement.
+     * @param target The target to handle the requirement.
      */
-    constructor(name: string) {
+    constructor(name: string, target?: RequirementTarget) {
         this.name = name;
+        this.target = target ?? RequirementTarget.ANY;
         this.handler = async (): Promise<boolean> => true;
         this.whenelse = async () => {};
     }
@@ -35,7 +53,7 @@ export class Requirement {
      * @param whenelse Called when return is false.
      * @returns The requirement.
      */
-    handle(handler: Awaitable<(command: CommandInteraction) => Promise<boolean>>, whenelse: Awaitable<(command: CommandInteraction) => Promise<void>>) {
+    handle(handler: Awaitable<(itr: Interaction) => Promise<boolean>>, whenelse: Awaitable<(itr: Interaction) => Promise<void>>) {
         this.handler = handler;
         this.whenelse = whenelse;
 
@@ -47,11 +65,56 @@ export class Requirement {
      * @param command The command to check.
      * @returns Whether the requirement is met.
      */
-    async call(command: CommandInteraction) {
-        // @ts-ignore
-        let andjsrk = await this.handler(command); // @ts-ignore
-        if (!andjsrk) await this.whenelse(command);
+    async call(itr: Interaction) {
+        switch (this.target) {
+            case RequirementTarget.ANY: // @ts-ignore
+                let andjsrk = await this.handler(itr); // @ts-ignore
+                if (!andjsrk) await this.whenelse(itr);
 
-        return andjsrk;
+                return andjsrk;
+
+            case RequirementTarget.COMMAND:
+                if (itr instanceof CommandInteraction) { // @ts-ignore
+                    let andjsrk = await this.handler(itr); // @ts-ignore
+                    if (!andjsrk) await this.whenelse(itr);
+
+                    return andjsrk;
+                }
+
+                return true;
+
+            case RequirementTarget.BUTTON:
+                if (itr instanceof MessageButton) { // @ts-ignore
+                    let andjsrk = await this.handler(itr); // @ts-ignore
+                    if (!andjsrk) await this.whenelse(itr);
+
+                    return andjsrk;
+                }
+
+                return true;
+                
+            case RequirementTarget.SELECTMENU:
+                if (itr instanceof MessageSelectMenu) { // @ts-ignore
+                    let andjsrk = await this.handler(itr); // @ts-ignore
+                    if (!andjsrk) await this.whenelse(itr);
+                    
+                    return andjsrk;
+                }
+
+                return true;
+
+            case RequirementTarget.MODAL:
+                if (itr instanceof ModalSubmitInteraction) { // @ts-ignore
+                    let andjsrk = await this.handler(itr); // @ts-ignore
+                    if (!andjsrk) await this.whenelse(itr);
+
+                    return andjsrk;
+                }
+
+                return true;
+
+            default:
+                return true;
+        }
     }
 }

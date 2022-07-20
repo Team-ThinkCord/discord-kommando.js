@@ -92,7 +92,7 @@ export class Command {
     public toJSON: typeof SlashCommandBuilder.prototype.toJSON;
 
     /**
-     * The raw requirements before loading
+     * The raw requirements before load.
      */
     private readonly rawRequires: string[];
 
@@ -243,8 +243,6 @@ export class Command {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                console.log(requirement);
-
                 results.push(await requirement!!.call(itr));
             }
 
