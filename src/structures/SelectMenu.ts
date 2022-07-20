@@ -82,6 +82,7 @@ export class SelectMenu {
 
             for (const requirement of this.requires) {
                 results.push(await requirement!!.call(menu));
+                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

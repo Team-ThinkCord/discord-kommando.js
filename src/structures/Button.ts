@@ -95,6 +95,7 @@ export class Button {
 
             for (const requirement of this.requires) {
                 results.push(await requirement!!.call(button));
+                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;
