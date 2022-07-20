@@ -2,12 +2,12 @@ import { ButtonInteraction, InteractionButtonOptions, LinkButtonOptions, Message
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { KommandoClient, Requirement } from ".";
 
-interface LinkButtonData extends LinkButtonOptions {
+export interface LinkButtonData extends LinkButtonOptions {
     id: string;
     requires?: string[];
 }
 
-interface InteractionButtonData extends InteractionButtonOptions {
+export interface InteractionButtonData extends InteractionButtonOptions {
     id: string;
     requires?: string[];
 }

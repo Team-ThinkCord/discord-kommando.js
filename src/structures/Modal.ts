@@ -1,9 +1,21 @@
-import { ModalOptions, Modal as DJSModal, ModalSubmitInteraction } from "discord.js";
+import { ModalOptions, Modal as DJSModal, ModalSubmitInteraction, TextInputStyleResolvable, MessageActionRow, TextInputComponent, ModalActionRowComponentResolvable } from "discord.js";
 import { KommandoClient, Requirement } from ".";
 
-export interface ModalData extends Omit<ModalOptions, "customId"> {
+export interface ModalData extends Omit<Omit<ModalOptions, "customId">, "components"> {
     id: string;
+    components?: TextInputData[];
     requires?: string[];
+}
+
+export interface TextInputData {
+    customId: string;
+    label: string;
+    minLength?: number;
+    maxLength?: number;
+    placeholder?: string;
+    required?: boolean;
+    style: TextInputStyleResolvable;
+    value?: string;
 }
 
 export class Modal {
@@ -36,8 +48,28 @@ export class Modal {
         this.id = data.id;
         this.requires = [];
         this.rawRequires = data.requires ?? [];
-        this.modal = new DJSModal({ ...data, customId: data.id });
+        this.modal = new DJSModal({ ...data, customId: data.id, components: [] });
         this.callback = () => {};
+
+        if (data.components?.length) this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(...data.components.map(c => new TextInputComponent(c))));
+    }
+
+    /**
+     * Add a text input component to the modal.
+     */
+    public addComponent(data: TextInputData | TextInputComponent) {
+        this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(new TextInputComponent(data)));
+
+        return this;
+    }
+
+    /**
+     * Add text input components to the modal.
+     */
+    public addComponents(...components: TextInputData[] | TextInputComponent[]) {
+        components.forEach(this.addComponent);
+
+        return this;
     }
 
     /**

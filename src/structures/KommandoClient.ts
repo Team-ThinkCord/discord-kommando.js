@@ -175,6 +175,24 @@ export class KommandoClient extends Client {
             }
         }
 
+        if (fs.existsSync(`${this.kommando.directory}/selectmenus`)) {
+            let selectMenuFiles = fs.readdirSync(`${this.kommando.directory}/selectmenus`).filter(file => file.endsWith('.js'));
+            for (let file of selectMenuFiles) {
+                let selectMenu: SelectMenu = require(`../../../../${this.kommando.directory}/selectmenus/${file}`);
+
+                this.selectMenus.set(selectMenu.id, selectMenu.register(this));
+            }
+        }
+
+        if (fs.existsSync(`${this.kommando.directory}/modals`)) {
+            let modalFiles = fs.readdirSync(`${this.kommando.directory}/modals`).filter(file => file.endsWith('.js'));
+            for (let file of modalFiles) {
+                let modal: Modal = require(`../../../../${this.kommando.directory}/modals/${file}`);
+
+                this.modals.set(modal.id, modal.register(this));
+            }
+        }
+
         this.once("ready", this.registerCommands);
 
         if (!this.kommando.noAutoHandle) {
