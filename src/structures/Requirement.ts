@@ -28,12 +28,12 @@ export class Requirement {
     /**
      * The handler of the requirement.
      */
-    public handler: Awaitable<(itr: Interaction) => Promise<boolean>>;
+    public handler: Awaitable<(itr: Interaction) => Promise<boolean> | boolean>;
 
     /**
      * Called when return is false.
      */
-    public whenelse: Awaitable<(itr: Interaction) => Promise<void>>;
+    public whenelse: Awaitable<(itr: Interaction) => Promise<any | void> | any | void>;
 
     /**
      * Creates a new requirement.
@@ -53,7 +53,7 @@ export class Requirement {
      * @param whenelse Called when return is false.
      * @returns The requirement.
      */
-    handle(handler: Awaitable<(itr: Interaction) => Promise<boolean>>, whenelse: Awaitable<(itr: Interaction) => Promise<void>>) {
+    handle(handler: Awaitable<(itr: Interaction) => Promise<boolean> | boolean>, whenelse: Awaitable<(itr: Interaction) => Promise<any | void> | void>) {
         this.handler = handler;
         this.whenelse = whenelse;
 
@@ -72,6 +72,7 @@ export class Requirement {
                 if (!andjsrk) await this.whenelse(itr);
 
                 return andjsrk;
+                break;
 
             case RequirementTarget.COMMAND:
                 if (itr instanceof CommandInteraction) { // @ts-ignore
@@ -82,6 +83,7 @@ export class Requirement {
                 }
 
                 return true;
+                break;
 
             case RequirementTarget.BUTTON:
                 if (itr instanceof MessageButton) { // @ts-ignore
@@ -92,6 +94,7 @@ export class Requirement {
                 }
 
                 return true;
+                break;
                 
             case RequirementTarget.SELECTMENU:
                 if (itr instanceof MessageSelectMenu) { // @ts-ignore
@@ -102,6 +105,7 @@ export class Requirement {
                 }
 
                 return true;
+                break;
 
             case RequirementTarget.MODAL:
                 if (itr instanceof ModalSubmitInteraction) { // @ts-ignore
@@ -112,9 +116,11 @@ export class Requirement {
                 }
 
                 return true;
+                break;
 
             default:
                 return true;
+                break;
         }
     }
 }
