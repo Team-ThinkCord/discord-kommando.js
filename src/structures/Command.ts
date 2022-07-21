@@ -33,7 +33,7 @@ export interface OptionData {
     name: string,
     description: string,
     choices?: unknown[],
-    autocomplete: boolean,
+    autocomplete?: boolean,
     required?: boolean,
     minValue?: number,
     maxValue?: number,
