@@ -155,8 +155,6 @@ export class KommandoClient extends Client {
             for (let file of requirementFiles) {
                 let requirement: Requirement = require(`../../../../${this.kommando.directory}/requirements/${file}`);
                 this.requirements.set(requirement.name, requirement);
-
-                console.log(this.requirements)
             }
         }
 
