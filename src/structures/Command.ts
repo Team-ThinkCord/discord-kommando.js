@@ -157,7 +157,7 @@ export class Command {
             // @ts-ignore
             data.choices?.length && opt.addChoices(...data.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
             data.autocomplete != undefined && opt.setAutocomplete(data.autocomplete); // @ts-ignore
-            data.channelTypes?.length && opt.addChannelTypes(data.channelTypes); // @ts-ignore
+            data.channelTypes?.length && opt.addChannelTypes(...data.channelTypes); // @ts-ignore
             data.minValue != undefined && opt.setMinValue(data.minValue); // @ts-ignore
             data.maxValue != undefined && opt.setMaxValue(data.maxValue);
 

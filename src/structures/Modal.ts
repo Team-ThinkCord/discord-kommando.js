@@ -67,7 +67,8 @@ export class Modal {
      * Add text input components to the modal.
      */
     public addComponents(...components: TextInputData[] | TextInputComponent[]) {
-        components.forEach(this.addComponent);
+        for (let i = 0; i < components.length; i++) 
+            this.addComponent(components[i]);
 
         return this;
     }
