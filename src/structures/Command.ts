@@ -162,9 +162,8 @@ export class Command {
         let optionName = data.type.charAt(0).toUpperCase() + data.type.slice(1);
         let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
         
-
         // @ts-ignore
-        this.data1[methodName]((option: SlashCommandOptions) => {
+        this.data[methodName]((option: SlashCommandOptions) => {
             let opt = (option)
                 .setName(data.name)
                 .setDescription(data.description)
@@ -270,7 +269,7 @@ export class Command {
                         let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
 
                         // @ts-ignore
-                        data[methodName]((option: SlashCommandOptions) => {
+                        data1[methodName]((option: SlashCommandOptions) => {
                             let opt = (option)
                                 .setName(opti.name)
                                 .setDescription(opti.description)

@@ -1,4 +1,4 @@
-import { Awaitable, CommandInteraction, Interaction, MessageButton, MessageSelectMenu, ModalSubmitInteraction } from "discord.js";
+import { AutocompleteInteraction, Awaitable, CommandInteraction, Interaction, MessageButton, MessageSelectMenu, ModalSubmitInteraction } from "discord.js";
 
 /**
  * The requirement target.
@@ -8,7 +8,9 @@ export enum RequirementTarget {
     COMMAND,
     BUTTON,
     SELECTMENU,
-    MODAL
+    MODAL,
+    AUTOCOMPLETE,
+    CONTEXTMENU
 }
 
 /**
@@ -82,7 +84,7 @@ export class Requirement {
                     return andjsrk;
                 }
 
-                return true;
+                return false;
                 break;
 
             case RequirementTarget.BUTTON:
@@ -93,7 +95,7 @@ export class Requirement {
                     return andjsrk;
                 }
 
-                return true;
+                return false;
                 break;
                 
             case RequirementTarget.SELECTMENU:
@@ -104,7 +106,7 @@ export class Requirement {
                     return andjsrk;
                 }
 
-                return true;
+                return false;
                 break;
 
             case RequirementTarget.MODAL:
@@ -115,11 +117,19 @@ export class Requirement {
                     return andjsrk;
                 }
 
-                return true;
+                return false;
                 break;
 
+            case RequirementTarget.AUTOCOMPLETE:
+                if (itr instanceof AutocompleteInteraction) { // @ts-ignore
+                    let andjsrk = await this.handler(itr); // @ts-ignore
+                    if (!andjsrk) await this.whenelse(itr);
+
+                    return andjsrk;
+                }
+
             default:
-                return true;
+                return false;
                 break;
         }
     }
