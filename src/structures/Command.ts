@@ -164,7 +164,7 @@ export class Command {
         
 
         // @ts-ignore
-        this.data[methodName]((option: SlashCommandOptions) => {
+        this.data1[methodName]((option: SlashCommandOptions) => {
             let opt = (option)
                 .setName(data.name)
                 .setDescription(data.description)
