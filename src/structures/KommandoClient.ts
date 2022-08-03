@@ -2,7 +2,7 @@ import { Client, Intents, Collection, ClientOptions, Interaction, Util } from 'd
 import fs from 'fs';
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
-import { Command, Plugin, Requirement, Button, SelectMenu, Modal } from '.';
+import { Command, Plugin, Requirement, Button, SelectMenu, Modal, Autocomplete, ContextMenu } from '.';
 
 let has = <T extends {}>(o: T, k: string) => Object.prototype.hasOwnProperty.call(o, k);
 
@@ -114,6 +114,16 @@ export class KommandoClient extends Client {
     public modals: Collection<string, Modal>;
 
     /**
+     * The client autocompeletes.
+     */
+    public autocompletes: Collection<string, Autocomplete>;
+
+    /**
+     * The client context menu commands.
+     */
+    public contextMenuCommands: Collection<string, ContextMenu>;
+
+    /**
      * The client plugins.
      */
     public plugins: Plugin[];
@@ -139,6 +149,8 @@ export class KommandoClient extends Client {
         this.buttons = new Collection();
         this.selectMenus = new Collection();
         this.modals = new Collection();
+        this.autocompletes = new Collection();
+        this.contextMenuCommands = new Collection();
 
         this.plugins = [];
 
@@ -191,6 +203,24 @@ export class KommandoClient extends Client {
             }
         }
 
+        if (fs.existsSync(`${this.kommando.directory}/autocompletes`)) {
+            let autocompleteFiles = fs.readdirSync(`${this.kommando.directory}/autocompletes`).filter(file => file.endsWith('.js'));
+            for (let file of autocompleteFiles) {
+                let autocomplete: Autocomplete = require(`../../../../${this.kommando.directory}/autocompletes/${file}`);
+
+                this.autocompletes.set(autocomplete.name, autocomplete.register(this));
+            }
+        }
+
+        if (fs.existsSync(`${this.kommando.directory}/contextmenus`)) {
+            let contextMenuFiles = fs.readdirSync(`${this.kommando.directory}/contextmenus`).filter(file => file.endsWith('.js'));
+            for (let file of contextMenuFiles) {
+                let contextMenu: ContextMenu = require(`../../../../${this.kommando.directory}/contextmenus/${file}`);
+
+                this.contextMenuCommands.set(contextMenu.name, contextMenu.register(this));
+            }
+        }
+
         this.once("ready", this.registerCommands);
 
         if (!this.kommando.noAutoHandle) {
@@ -202,8 +232,9 @@ export class KommandoClient extends Client {
      * Register the commands.
      */
     async registerCommands() {
-        let commands: any[] = [];
-        this.commands.map(c => commands.push(c.toJSON()));
+        let commands: unknown[] = [];
+        this.commands.forEach(c => commands.push(c.toJSON()));
+        this.contextMenuCommands.forEach(c => commands.push(c.toJSON()));
 
         if (this.kommando.test.enable) {
             if (this.kommando.test.guild == null) throw new TypeError("[options.test.guild] Expected string. but got null instead.");
@@ -232,6 +263,8 @@ export class KommandoClient extends Client {
         this.buttonHandler(itr);
         this.selectMenuHandler(itr);
         this.modalHandler(itr);
+        this.autocompleteHandler(itr);
+        this.contextMenuHandler(itr);
     }
 
     /**
@@ -302,6 +335,38 @@ export class KommandoClient extends Client {
 
         try {
             let promise: Promise<undefined | Modal> | undefined = this.modals.find(modal => modal.id == itr.customId)?.call(itr);
+
+            if (promise instanceof Promise) promise.catch(err => {
+                console.error(err);
+                this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+            });
+        } catch (err) {
+            console.error(err);
+            this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+        }
+    }
+
+    public autocompleteHandler(itr: Interaction) {
+        if (!itr.isAutocomplete()) return;
+
+        try {
+            let promise: Promise<undefined | Autocomplete> | undefined = this.autocompletes.find(autocomplete => autocomplete.name == itr.commandName)?.call(itr);
+
+            if (promise instanceof Promise) promise.catch(err => {
+                console.error(err);
+                this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+            });
+        } catch (err) {
+            console.error(err);
+            this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
+        }
+    }
+
+    public contextMenuHandler(itr: Interaction) {
+        if (!itr.isContextMenu()) return;
+
+        try {
+            let promise: Promise<undefined | ContextMenu> | undefined = this.contextMenuCommands.get(itr.commandName)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
                 console.error(err);

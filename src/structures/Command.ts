@@ -9,7 +9,6 @@ const allowedChannelTypes = [
   ChannelType.GuildVoice,
   ChannelType.GuildCategory,
   ChannelType.GuildNews,
-  ChannelType.GuildStore,
   ChannelType.GuildNewsThread,
   ChannelType.GuildPublicThread,
   ChannelType.GuildPrivateThread,
@@ -27,7 +26,25 @@ export interface CommandData {
 }
 
 /**
- * An option data to be used in a command.
+ * The subcommand data to create a subcommand.
+ */
+export interface SubcommandData {
+    name: string,
+    description: string,
+    options?: OptionData[]
+}
+
+/**
+ * The subcommand group data to create a subcommand group.
+ */
+export interface SubcommandGroupData {
+    name: string,
+    description: string,
+    commands: SubcommandData[]
+}
+
+/**
+ * The option data to be used in a command.
  */
 export interface OptionData {
     name: string,
@@ -105,12 +122,11 @@ export class Command {
      * The callbacks of the command.
      */
     private readonly callbacks: { default: (itr: CommandInteraction) => void, [key: string]: (itr: CommandInteraction) => void }
-
-    /**
-     * The kommando client.
-     */
-    private client?: KommandoClient;
     
+    /**
+     * Create a new command handler.
+     * @param data The data of the command.
+     */
     constructor(data: CommandData) {
         this.name = data.name;
         this.description = data.description;
@@ -182,8 +198,6 @@ export class Command {
      * @param client The client to register.
      */
     register(client: KommandoClient) {
-        this.client = client;
-
         this.requires = this.rawRequires.map(requirement => client.requirements.get(requirement));
 
         this.requires.forEach((requirement, i) => { // Checks requirement is defined
@@ -197,12 +211,38 @@ export class Command {
      * Add sub command to the command.
      * @param input The sub command to add.
      */
-    addSubcommand(
-        input:
-                      SlashCommandSubcommandBuilder |
-                      ((subcommand: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder)
-    ): Command {
-        this.data.addSubcommand(input);
+    addSubcommand(input: SubcommandData): Command {
+        let data = new SlashCommandSubcommandBuilder();
+
+        data
+            .setName(input.name)
+            .setDescription(input.description);
+
+        if (input.options) {
+            input.options.forEach(opti => {
+                let optionName = opti.type.charAt(0).toUpperCase() + opti.type.slice(1);
+                let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
+
+                // @ts-ignore
+                data[methodName]((option: SlashCommandOptions) => {
+                    let opt = (option)
+                        .setName(opti.name)
+                        .setDescription(opti.description)
+                        .setRequired(opti.required ?? false);
+
+                    // @ts-ignore
+                    data.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
+                    data.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
+                    data.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
+                    data.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
+                    data.maxValue != undefined && opt.setMaxValue(opti.maxValue);
+
+                    return opt;
+                });
+            });
+        }
+
+        this.data.addSubcommand(data);
         return this;
     }
 
@@ -210,12 +250,48 @@ export class Command {
      * Add sub command group to the command.
      * @param group The sub commands to add.
      */
-    addSubcommandGroup(
-        group:
-            SlashCommandSubcommandGroupBuilder |
-            ((subcommandGroup: SlashCommandSubcommandGroupBuilder) => SlashCommandSubcommandGroupBuilder)
-    ): Command {
-        this.data.addSubcommandGroup(group);
+    addSubcommandGroup(group: SubcommandGroupData): Command {
+        let data = new SlashCommandSubcommandGroupBuilder();
+
+        data
+            .setName(group.name)
+            .setDescription(group.description);
+        
+        group.commands.forEach(input => {
+            let data1 = new SlashCommandSubcommandBuilder();
+
+                data1
+                    .setName(input.name)
+                    .setDescription(input.description);
+
+                if (input.options) {
+                    input.options.forEach(opti => {
+                        let optionName = opti.type.charAt(0).toUpperCase() + opti.type.slice(1);
+                        let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
+
+                        // @ts-ignore
+                        data[methodName]((option: SlashCommandOptions) => {
+                            let opt = (option)
+                                .setName(opti.name)
+                                .setDescription(opti.description)
+                                .setRequired(opti.required ?? false);
+
+                            // @ts-ignore
+                            data.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
+                            data.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
+                            data.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
+                            data.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
+                            data.maxValue != undefined && opt.setMaxValue(opti.maxValue);
+
+                            return opt;
+                        });
+                    });
+                }
+
+                data.addSubcommand(data1);
+        });
+
+        this.data.addSubcommandGroup(data);
         return this;
     }
 

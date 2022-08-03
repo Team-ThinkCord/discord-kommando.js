@@ -5,3 +5,5 @@ export * from './Plugin';
 export * from './Button';
 export * from './SelectMenu';
 export * from './Modal';
+export * from './Autocomplete';
+export * from './ContextMenu';
