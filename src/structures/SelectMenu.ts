@@ -59,7 +59,7 @@ export class SelectMenu {
      * Get the button.
      */
     public getMenu(): MessageSelectMenu {
-        return this.menu;
+        return new MessageSelectMenu(this.menu);
     }
 
     /**

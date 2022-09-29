@@ -18,7 +18,8 @@ const KommandoOptions = {
         guild: null as string | null,
     },
     disableMessages: false,
-    noAutoHandle: false
+    noAutoHandle: false,
+    disableCache: false
 }
 
 export interface IKommandoOptions {
@@ -27,7 +28,12 @@ export interface IKommandoOptions {
      *
      * % = directory
      * %: The directory to look for commands in.
-     * %/requirements: The directory to look for requirements in.
+     * %/requirements
+     * %/buttons
+     * %/selectmenus
+     * %/modals
+     * %/autocompletes
+     * %/contextmenus
      */
     directory: string;
 
@@ -80,6 +86,11 @@ export interface IKommandoOptions {
      * Whether to disable the auto-handling of commands.
      */
     noAutoHandle?: boolean;
+
+    /**
+     * Whether to disable caching. If you disable, your application will rate-limited
+     */
+    disableCache?: boolean;
 }
 
 export class KommandoClient extends Client {
@@ -165,59 +176,75 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
             let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`).filter(file => file.endsWith('.js'));
             for (let file of requirementFiles) {
-                let requirement: Requirement = require(`../../../../${this.kommando.directory}/requirements/${file}`);
-                this.requirements.set(requirement.name, requirement);
+                let requirement: Requirement | { default: Requirement } = require(`../../../../${this.kommando.directory}/requirements/${file}`);
+
+                if (requirement instanceof Requirement) 
+                    this.requirements.set(requirement.name, requirement);
+                else this.requirements.set(requirement.default.name, requirement.default);
             }
         }
 
         let commandFiles = fs.readdirSync(this.kommando.directory).filter(file => file.endsWith('.js'));
         for (let file of commandFiles) {
-            let command: Command = require(`../../../../${this.kommando.directory}/${file}`);
-            this.commands.set(command.name, command.register(this));
+            let command: Command | { default: Command } = require(`../../../../${this.kommando.directory}/${file}`);
+
+            if (command instanceof Command)
+                this.commands.set(command.name, command.register(this));
+            else this.commands.set(command.default.name, command.default.register(this));
         }
 
         if (fs.existsSync(`${this.kommando.directory}/buttons`)) {
             let buttonFiiles = fs.readdirSync(`${this.kommando.directory}/buttons`).filter(file => file.endsWith('.js'));
             for (let file of buttonFiiles) {
-                let button: Button = require(`../../../../${this.kommando.directory}/buttons/${file}`);
+                let button: Button | { default: Button } = require(`../../../../${this.kommando.directory}/buttons/${file}`);
 
-                this.buttons.set(button.id, button.register(this));
+                if (button instanceof Button) 
+                    this.buttons.set(button.id, button.register(this));
+                else this.buttons.set(button.default.id, button.default.register(this));
             }
         }
 
         if (fs.existsSync(`${this.kommando.directory}/selectmenus`)) {
             let selectMenuFiles = fs.readdirSync(`${this.kommando.directory}/selectmenus`).filter(file => file.endsWith('.js'));
             for (let file of selectMenuFiles) {
-                let selectMenu: SelectMenu = require(`../../../../${this.kommando.directory}/selectmenus/${file}`);
+                let selectMenu: SelectMenu | { default: SelectMenu} = require(`../../../../${this.kommando.directory}/selectmenus/${file}`);
 
-                this.selectMenus.set(selectMenu.id, selectMenu.register(this));
+                if (selectMenu instanceof SelectMenu)
+                    this.selectMenus.set(selectMenu.id, selectMenu.register(this));
+                else this.selectMenus.set(selectMenu.default.id, selectMenu.default.register(this));
             }
         }
 
         if (fs.existsSync(`${this.kommando.directory}/modals`)) {
             let modalFiles = fs.readdirSync(`${this.kommando.directory}/modals`).filter(file => file.endsWith('.js'));
             for (let file of modalFiles) {
-                let modal: Modal = require(`../../../../${this.kommando.directory}/modals/${file}`);
+                let modal: Modal | { default: Modal } = require(`../../../../${this.kommando.directory}/modals/${file}`);
 
-                this.modals.set(modal.id, modal.register(this));
+                if (modal instanceof Modal)
+                    this.modals.set(modal.id, modal.register(this));
+                else this.modals.set(modal.default.id, modal.default.register(this));
             }
         }
 
         if (fs.existsSync(`${this.kommando.directory}/autocompletes`)) {
             let autocompleteFiles = fs.readdirSync(`${this.kommando.directory}/autocompletes`).filter(file => file.endsWith('.js'));
             for (let file of autocompleteFiles) {
-                let autocomplete: Autocomplete = require(`../../../../${this.kommando.directory}/autocompletes/${file}`);
+                let autocomplete: Autocomplete | { default: Autocomplete } = require(`../../../../${this.kommando.directory}/autocompletes/${file}`);
 
-                this.autocompletes.set(autocomplete.name, autocomplete.register(this));
+                if (autocomplete instanceof Autocomplete)
+                    this.autocompletes.set(autocomplete.name, autocomplete.register(this));
+                else this.autocompletes.set(autocomplete.default.name, autocomplete.default.register(this));
             }
         }
 
         if (fs.existsSync(`${this.kommando.directory}/contextmenus`)) {
             let contextMenuFiles = fs.readdirSync(`${this.kommando.directory}/contextmenus`).filter(file => file.endsWith('.js'));
             for (let file of contextMenuFiles) {
-                let contextMenu: ContextMenu = require(`../../../../${this.kommando.directory}/contextmenus/${file}`);
+                let contextMenu: ContextMenu | { default: ContextMenu } = require(`../../../../${this.kommando.directory}/contextmenus/${file}`);
 
-                this.contextMenuCommands.set(contextMenu.name, contextMenu.register(this));
+                if (contextMenu instanceof ContextMenu) 
+                    this.contextMenuCommands.set(contextMenu.name, contextMenu.register(this));
+                else this.contextMenuCommands.set(contextMenu.default.name, contextMenu.default.register(this));
             }
         }
 

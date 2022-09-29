@@ -1,6 +1,6 @@
 {
   "name": "discord-kommando.js",
-  "version": "2.1.9",
+  "version": "2.1.9.1",
   "description": "an Automatic command handler for discord.js",
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "echo **Error** No test specified.",
-    "prepublishOnly": "tsc",
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
     "docs": "typedoc src/main.ts"
   },
   "repository": {

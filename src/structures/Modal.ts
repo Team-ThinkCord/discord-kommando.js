@@ -87,7 +87,7 @@ export class Modal {
      * Get the modal.
      */
     public getModal(): DJSModal {
-        return this.modal;
+        return new DJSModal(this.modal);
     }
 
     /**

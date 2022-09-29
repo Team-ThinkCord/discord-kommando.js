@@ -1,18 +1,8 @@
-import { ButtonInteraction, InteractionButtonOptions, LinkButtonOptions, MessageButton } from "discord.js";
-import { MessageButtonStyles } from "discord.js/typings/enums";
-import { KommandoClient, Requirement } from ".";
+import { ButtonInteraction, MessageButton } from "discord.js";
+import { MessageButtonOptions } from "discord.js";
+import { KommandoClient, Requirement, Util } from ".";
 
-export interface LinkButtonData extends LinkButtonOptions {
-    id: string;
-    requires?: string[];
-}
-
-export interface InteractionButtonData extends InteractionButtonOptions {
-    id: string;
-    requires?: string[];
-}
-
-export type ButtonData = LinkButtonData | InteractionButtonData;
+export type ButtonData = Omit<MessageButtonOptions, 'customId'> & { id: string, requires?: string[] };
 
 export class Button {
     /**
@@ -51,10 +41,10 @@ export class Button {
      */
     public constructor(data: ButtonData) {
         this.id = data.id; // @ts-ignore
-        this.customId = (data.style != "LINK" && data.style != MessageButtonStyles.LINK) ? data.customId : undefined;
+        this.customId = (data.style != "LINK" && data.style != MessageButtonStyles.LINK) ? data.id : undefined;
         this.requires = [];
-        this.rawRequires = data.requires ?? [];
-        this.button = new MessageButton(data);
+        this.rawRequires = data.requires ?? []; // @ts-ignore 
+        this.button = new MessageButton(Util.isInteractionButtonOptions(data) ? { customId: data.id, ...data } : { ...data });
         this.callback = () => {};
     }
 
@@ -72,7 +62,7 @@ export class Button {
      * Get the button.
      */
     public getButton(): MessageButton {
-        return this.button;
+        return new MessageButton(this.button);
     }
 
     /**
