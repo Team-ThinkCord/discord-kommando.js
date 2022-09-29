@@ -1,5 +1,6 @@
 import { ButtonInteraction, MessageButton } from "discord.js";
 import { MessageButtonOptions } from "discord.js";
+import { MessageButtonStyles } from "discord.js/typings/enums";
 import { KommandoClient, Requirement, Util } from ".";
 
 export type ButtonData = Omit<MessageButtonOptions, 'customId'> & { id: string, requires?: string[] };
