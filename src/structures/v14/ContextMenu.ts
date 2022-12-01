@@ -1,5 +1,4 @@
-import { ContextMenuCommandBuilder } from "@discordjs/builders";
-import { ContextMenuInteraction } from "discord.js";
+import { ContextMenuCommandBuilder, ContextMenuCommandInteraction } from "discord.js-14";
 import { KommandoClient, Requirement } from ".";
 
 export interface ContextMenuData {
@@ -28,7 +27,7 @@ export class ContextMenu {
 
     public toJSON: typeof ContextMenuCommandBuilder.prototype.toJSON;
 
-    private callback: (interaction: ContextMenuInteraction) => void;
+    private callback: (interaction: ContextMenuCommandInteraction) => void;
 
     private data: ContextMenuCommandBuilder;
 
@@ -56,18 +55,18 @@ export class ContextMenu {
         return this;
     }
 
-    public handle(callback: (interaction: ContextMenuInteraction) => void) {
+    public handle(callback: (interaction: ContextMenuCommandInteraction) => void) {
         this.callback = callback;
 
         return this;
     }
 
-    async call(interaction: ContextMenuInteraction) {
+    async call(interaction: ContextMenuCommandInteraction) {
         if (this.requires.length) {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                results.push(await requirement!!.call(interaction));
+                if (interaction.isMessageContextMenuCommand() || interaction.isUserContextMenuCommand()) results.push(await requirement!!.call(interaction));
                 if (results.includes(false)) continue;
             }
 

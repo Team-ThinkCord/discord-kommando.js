@@ -1,7 +1,7 @@
-import { ModalOptions, Modal as DJSModal, ModalSubmitInteraction, TextInputStyleResolvable, MessageActionRow, TextInputComponent, ModalActionRowComponentResolvable } from "discord.js";
+import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, TextInputStyle, ActionRowBuilder as MessageActionRow, TextInputBuilder, TextInputComponent as TextInputComponent } from "discord.js-14";
 import { KommandoClient, Requirement } from ".";
 
-export interface ModalData extends Omit<Omit<ModalOptions, "customId">, "components"> {
+export interface ModalData extends Omit<Omit<ModalComponentData, "customId">, "components"> {
     id: string;
     components?: TextInputData[];
     requires?: string[];
@@ -14,7 +14,7 @@ export interface TextInputData {
     maxLength?: number;
     placeholder?: string;
     required?: boolean;
-    style: TextInputStyleResolvable;
+    style: TextInputStyle;
     value?: string;
 }
 
@@ -51,14 +51,14 @@ export class Modal {
         this.modal = new DJSModal({ ...data, customId: data.id, components: [] });
         this.callback = () => {};
 
-        if (data.components?.length) this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(...data.components.map(c => new TextInputComponent(c))));
+        if (data.components?.length) this.modal.addComponents(new MessageActionRow<TextInputBuilder>().addComponents(...data.components.map(c => new TextInputBuilder(c))));
     }
 
     /**
      * Add a text input component to the modal.
      */
-    public addComponent(data: TextInputData | TextInputComponent) {
-        this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(new TextInputComponent(data)));
+    public addComponent(data: TextInputData | TextInputBuilder) {
+        this.modal.addComponents(new MessageActionRow<TextInputBuilder>().addComponents((data instanceof TextInputBuilder) ? data : new TextInputBuilder(data)));
 
         return this;
     }
@@ -66,7 +66,7 @@ export class Modal {
     /**
      * Add text input components to the modal.
      */
-    public addComponents(...components: TextInputData[] | TextInputComponent[]) {
+    public addComponents(...components: TextInputData[] | TextInputBuilder[]) {
         for (let i = 0; i < components.length; i++) 
             this.addComponent(components[i]);
 
@@ -109,8 +109,8 @@ export class Modal {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                results.push(await requirement!!.call(modal));
                 if (results.includes(false)) continue;
+                results.push(await requirement!!.call(modal));
             }
 
             if (results.includes(false)) return;

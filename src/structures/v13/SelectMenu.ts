@@ -1,4 +1,4 @@
-import { MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction } from "discord.js";
+import { MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction } from "discord.js-13";
 import { KommandoClient, Requirement } from ".";
 
 export interface MenuData extends Omit<MessageSelectMenuOptions, 'customId'> {

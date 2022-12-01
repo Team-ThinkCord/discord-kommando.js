@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, Awaitable, CommandInteraction, Interaction, MessageButton, MessageSelectMenu, ModalSubmitInteraction } from "discord.js";
+import { Awaitable, Interaction } from "discord.js-14";
 
 /**
  * The requirement target.
@@ -30,12 +30,12 @@ export class Requirement {
     /**
      * The handler of the requirement.
      */
-    public handler: Awaitable<(itr: Interaction) => Promise<boolean> | boolean>;
+    public handler: (itr: Interaction) => Awaitable<Promise<boolean> | boolean>;
 
     /**
      * Called when return is false.
      */
-    public whenelse: Awaitable<(itr: Interaction) => Promise<any | void> | any | void>;
+    public whenelse: (itr: Interaction) => Awaitable<Promise<any | void> | any | void>;
 
     /**
      * Creates a new requirement.
@@ -55,7 +55,7 @@ export class Requirement {
      * @param whenelse Called when return is false.
      * @returns The requirement.
      */
-    handle(handler: Awaitable<(itr: Interaction) => Promise<boolean> | boolean>, whenelse: Awaitable<(itr: Interaction) => Promise<any | void> | void>) {
+    handle(handler: (itr: Interaction) => Awaitable<Promise<boolean> | boolean>, whenelse: (itr: Interaction) => Awaitable<Promise<any | void> | void>) {
         this.handler = handler;
         this.whenelse = whenelse;
 
@@ -64,73 +64,79 @@ export class Requirement {
 
     /**
      * Checks if the requirement is met.
-     * @param command The command to check.
+     * @param itr The interaction to check.
      * @returns Whether the requirement is met.
      */
     async call(itr: Interaction) {
         switch (this.target) {
-            case RequirementTarget.ANY: // @ts-ignore
-                let andjsrk = await this.handler(itr); // @ts-ignore
+            case RequirementTarget.ANY:
+                let andjsrk = await this.handler(itr);
                 if (!andjsrk) await this.whenelse(itr);
 
-                return andjsrk;
-                break;
+                return andjsrk as boolean;
 
             case RequirementTarget.COMMAND:
-                if (itr instanceof CommandInteraction) { // @ts-ignore
-                    let andjsrk = await this.handler(itr); // @ts-ignore
+                if (itr.isChatInputCommand()) {
+                    let andjsrk = await this.handler(itr);
                     if (!andjsrk) await this.whenelse(itr);
 
-                    return andjsrk;
+                    return andjsrk as boolean;
                 }
 
                 return false;
-                break;
 
             case RequirementTarget.BUTTON:
-                if (itr instanceof MessageButton) { // @ts-ignore
-                    let andjsrk = await this.handler(itr); // @ts-ignore
+                if (itr.isButton()) {
+                    let andjsrk = await this.handler(itr);
                     if (!andjsrk) await this.whenelse(itr);
 
-                    return andjsrk;
+                    return andjsrk as boolean;
                 }
 
                 return false;
-                break;
                 
             case RequirementTarget.SELECTMENU:
-                if (itr instanceof MessageSelectMenu) { // @ts-ignore
-                    let andjsrk = await this.handler(itr); // @ts-ignore
+                if (itr.isAnySelectMenu()) {
+                    let andjsrk = await this.handler(itr);
                     if (!andjsrk) await this.whenelse(itr);
                     
-                    return andjsrk;
+                    return andjsrk as boolean;
                 }
 
                 return false;
-                break;
 
             case RequirementTarget.MODAL:
-                if (itr instanceof ModalSubmitInteraction) { // @ts-ignore
-                    let andjsrk = await this.handler(itr); // @ts-ignore
+                if (itr.isModalSubmit()) {
+                    let andjsrk = await this.handler(itr);
                     if (!andjsrk) await this.whenelse(itr);
 
-                    return andjsrk;
+                    return andjsrk as boolean;
                 }
 
                 return false;
-                break;
 
             case RequirementTarget.AUTOCOMPLETE:
-                if (itr instanceof AutocompleteInteraction) { // @ts-ignore
-                    let andjsrk = await this.handler(itr); // @ts-ignore
+                if (itr.isAutocomplete()) { 
+                    let andjsrk = await this.handler(itr);
                     if (!andjsrk) await this.whenelse(itr);
 
-                    return andjsrk;
+                    return andjsrk as boolean;
                 }
+
+                return false;
+            
+            case RequirementTarget.CONTEXTMENU:
+                if (itr.isContextMenuCommand()) {
+                    let andjsrk = await this.handler(itr);
+                    if (!andjsrk) await this.whenelse(itr);
+
+                    return andjsrk as boolean;
+                }
+
+                return false;
 
             default:
                 return false;
-                break;
         }
     }
 }

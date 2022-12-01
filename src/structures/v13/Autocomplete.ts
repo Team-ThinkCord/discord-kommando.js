@@ -1,4 +1,4 @@
-import { AutocompleteInteraction } from "discord.js";
+import { AutocompleteInteraction } from "discord.js-13";
 import { KommandoClient, Requirement } from ".";
 
 export interface AutocompleteData {
@@ -8,9 +8,9 @@ export interface AutocompleteData {
     name: string;
 
     /**
-     * The command name.
+     * The option names like "(commandName) (subcommandGroup) (subcommand) (optionName)"
      */
-    commandName?: string;
+    optionNames: string[];
 
     /**
      * The requirements for the autocomplete handler.
@@ -27,7 +27,7 @@ export class Autocomplete {
     /**
      * The name of the target command.
      */
-    public commandName?: string;
+    public optionNames: string[];
 
     /**
      * The handler of the autocompelete option.
@@ -50,7 +50,7 @@ export class Autocomplete {
      */
     public constructor(data: AutocompleteData) {
         this.name = data.name;
-        this.commandName = data.commandName;
+        this.optionNames = data.optionNames;
         this.rawRequires = data.requires ?? [];
         this.callback = () => {}
     }
@@ -78,21 +78,27 @@ export class Autocomplete {
      * @param itr The interaction to call the callback with.
      */
     async call(itr: AutocompleteInteraction) {
-        if (this.commandName && itr.commandName != this.commandName) return;
+        let subcommandName = ((itr.options.getSubcommandGroup(false)?.length ? itr.options.getSubcommandGroup() + " " : "") + itr.options.getSubcommand(false));
+        let optionName = itr.options.getFocused(true).name;
+
+        if (!this.optionNames.filter(n => n == `${itr.commandName} ${subcommandName == 'null' ? "" : (subcommandName + " ")}${optionName}`).length)
+            return;
 
         if (this.requires.length) {
-            let results: Array<boolean> = [];
+            let results: boolean[] = [];
 
             for (const requirement of this.requires) {
                 results.push(await requirement!!.call(itr));
-                if (results.includes(false)) continue;
+                if (results.includes(false))
+                    continue;
             }
 
-            if (results.includes(false)) return;
+            if (results.includes(false))
+                return;
         }
-
+	
         this.callback(itr);
-        
+	
         return this;
     }
 }

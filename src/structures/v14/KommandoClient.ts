@@ -1,7 +1,7 @@
-import { Client, Intents, Collection, ClientOptions, Interaction, Util } from 'discord.js';
+import { Client, IntentsBitField, Collection, ClientOptions, Interaction, mergeDefault, REST } from 'discord.js-14';
+import { Util } from '.';
 import fs from 'fs';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import { Routes } from 'discord-api-types/v10';
 import { Command, Plugin, Requirement, Button, SelectMenu, Modal, Autocomplete, ContextMenu } from '.';
 
 let has = <T extends {}>(o: T, k: string) => Object.prototype.hasOwnProperty.call(o, k);
@@ -19,26 +19,36 @@ const KommandoOptions = {
     },
     disableMessages: false,
     noAutoHandle: false,
-    disableCache: false
+    disableCache: false,
+    useOldCommandDirectory: false
 }
 
 export interface IKommandoOptions {
     /**
-     * The directory to look for handlers in.
+     * The directory to look for handlers
      *
      * % = directory
+     *
      * %: The directory to look for commands in.
+     *
+     * %/commands: The new directory of commands
+     *
      * %/requirements
+     *
      * %/buttons
+     *
      * %/selectmenus
+     *
      * %/modals
+     *
      * %/autocompletes
+     *
      * %/contextmenus
      */
     directory: string;
 
     /**
-     * The messages
+     * The messages.
      */
     messages?: {
         /**
@@ -91,6 +101,12 @@ export interface IKommandoOptions {
      * Whether to disable caching. If you disable, your application will rate-limited
      */
     disableCache?: boolean;
+
+    /**
+     * @deprecated
+     * Whether to use old directory of commands
+     */
+    useOldCommandDirectory?: boolean;
 }
 
 export class KommandoClient extends Client {
@@ -149,12 +165,12 @@ export class KommandoClient extends Client {
      * @param options The kommando options.
      * @param opts The client options.
      */
-    constructor(options: IKommandoOptions, opts: ClientOptions = { intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}) {
-        super(<ClientOptions>Util.mergeDefault({ intents: [ Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS ]}, opts));
+    constructor(options: IKommandoOptions, opts: ClientOptions = { intents: [ IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers ]}) {
+        super(<ClientOptions>mergeDefault({ intents: [ IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMembers ]}, opts));
         
         if (!options || !has(options, 'directory')) throw new TypeError('Please provide the directory.');
         
-        this.kommando = <typeof KommandoOptions>Util.mergeDefault(KommandoOptions, options);
+        this.kommando = <typeof KommandoOptions>mergeDefault(KommandoOptions, options);
         this.commands = new Collection();
         this.requirements = new Collection();
         this.buttons = new Collection();
@@ -173,6 +189,8 @@ export class KommandoClient extends Client {
 
         if (this.kommando.directory.endsWith('/')) this.kommando.directory = this.kommando.directory.slice(0, this.kommando.directory.length - 1);
 
+        const commandsDirectory = this.kommando.useOldCommandDirectory ? `../../../../${this.kommando.directory}/` : `../../../../${this.kommando.directory}/commands/`;
+
         if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
             let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`).filter(file => file.endsWith('.js'));
             for (let file of requirementFiles) {
@@ -184,9 +202,9 @@ export class KommandoClient extends Client {
             }
         }
 
-        let commandFiles = fs.readdirSync(this.kommando.directory).filter(file => file.endsWith('.js'));
+        let commandFiles = fs.readdirSync(commandsDirectory.replaceAll('../', '')).filter(file => file.endsWith('.js'));
         for (let file of commandFiles) {
-            let command: Command | { default: Command } = require(`../../../../${this.kommando.directory}/${file}`);
+            let command: Command | { default: Command } = require(commandsDirectory + file);
 
             if (command instanceof Command)
                 this.commands.set(command.name, command.register(this));
@@ -259,22 +277,32 @@ export class KommandoClient extends Client {
      * Register the commands.
      */
     async registerCommands() {
-        let commands: unknown[] = [];
-        this.commands.forEach(c => commands.push(c.toJSON()));
-        this.contextMenuCommands.forEach(c => commands.push(c.toJSON()));
+        let oldCache = await Util.getCache();
+        let newCache = Util.clientToCachedJSON(this);
 
-        if (this.kommando.test.enable) {
-            if (this.kommando.test.guild == null) throw new TypeError("[options.test.guild] Expected string. but got null instead.");
+        console.log(oldCache);
 
-            await this.restManager.put(
-                Routes.applicationGuildCommands(this.user!!.id, this.kommando.test.guild),
-                { body: commands }
-            );
-        } else {
-            await this.restManager.put(
-                Routes.applicationCommands(this.user!!.id),
-                { body: commands }
-            );
+        if (!Util.arraysEqual(oldCache.commands, newCache.commands) || !Util.arraysEqual(oldCache.contextmenus, newCache.contextmenus)) {
+            let commands: unknown[] = [];
+
+            this.commands.forEach(c => commands.push(c.toJSON()));
+            this.contextMenuCommands.forEach(c => commands.push(c.toJSON()));
+
+            if (this.kommando.test.enable) {
+                if (this.kommando.test.guild == null) throw new TypeError("[options.test.guild] Expected string. but got null instead.");
+
+                await this.restManager.put(
+                    Routes.applicationGuildCommands(this.user!!.id, this.kommando.test.guild),
+                    { body: commands }
+                );
+            } else {
+                await this.restManager.put(
+                    Routes.applicationCommands(this.user!!.id),
+                    { body: commands }
+                );
+            }
+
+            await Util.cacheClient(this);
         }
 
         return;
@@ -300,7 +328,7 @@ export class KommandoClient extends Client {
      * @param itr The command.
      */
     public commandHandler(itr: Interaction) {
-        if (!itr.isCommand()) return;
+        if (!itr.isChatInputCommand()) return;
 
         try {
             let promise: Promise<undefined | Command> | undefined = this.commands.get(itr.commandName)?.call(itr);
@@ -342,7 +370,7 @@ export class KommandoClient extends Client {
      * @param itr The select menu.
      */
     public selectMenuHandler(itr: Interaction) {
-        if (!itr.isSelectMenu()) return;
+        if (!itr.isStringSelectMenu()) return;
 
         try {
             let promise: Promise<undefined | SelectMenu> | undefined = this.selectMenus.find(menu => menu.id == itr.customId)?.call(itr);
@@ -377,12 +405,10 @@ export class KommandoClient extends Client {
         if (!itr.isAutocomplete()) return;
 
         try {
-            let promise: Promise<undefined | Autocomplete> | undefined = this.autocompletes.find(autocomplete => autocomplete.name == itr.commandName)?.call(itr);
-
-            if (promise instanceof Promise) promise.catch(err => {
+            this.autocompletes.map(autocomplete => autocomplete.call(itr).catch(err => {
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
-            });
+            }));
         } catch (err) {
             console.error(err);
             this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
@@ -390,7 +416,7 @@ export class KommandoClient extends Client {
     }
 
     public contextMenuHandler(itr: Interaction) {
-        if (!itr.isContextMenu()) return;
+        if (!itr.isContextMenuCommand()) return;
 
         try {
             let promise: Promise<undefined | ContextMenu> | undefined = this.contextMenuCommands.get(itr.commandName)?.call(itr);

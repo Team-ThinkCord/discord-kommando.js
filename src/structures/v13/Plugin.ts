@@ -1,5 +1,5 @@
 import { Command, KommandoClient } from ".";
-import { ClientEvents, Collection, Util } from "discord.js";
+import { ClientEvents, Collection, Util } from "discord.js-13";
 
 export interface PluginConfig {
     /**

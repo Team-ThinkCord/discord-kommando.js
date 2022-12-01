@@ -1,18 +1,17 @@
-import { ChannelType } from 'discord-api-types/v9';
-import { CommandInteraction } from 'discord.js';
-import * as Builders from '@discordjs/builders';
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder } from '@discordjs/builders';
+import { ChannelType } from 'discord-api-types/v10';
+import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandMentionableOption, SlashCommandNumberOption, SlashCommandRoleOption, SlashCommandStringOption, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder, SlashCommandUserOption } from 'discord.js-14';
 import { KommandoClient, Requirement } from '.';
 
 const allowedChannelTypes = [
-  ChannelType.GuildText,
-  ChannelType.GuildVoice,
-  ChannelType.GuildCategory,
-  ChannelType.GuildNews,
-  ChannelType.GuildNewsThread,
-  ChannelType.GuildPublicThread,
-  ChannelType.GuildPrivateThread,
-  ChannelType.GuildStageVoice
+	ChannelType.GuildText,
+	ChannelType.GuildVoice,
+	ChannelType.GuildCategory,
+	ChannelType.GuildAnnouncement,
+	ChannelType.AnnouncementThread,
+	ChannelType.PublicThread,
+	ChannelType.PrivateThread,
+	ChannelType.GuildStageVoice,
+    ChannelType.GuildForum,
 ] as const;
 
 /**
@@ -75,14 +74,14 @@ export type SlashCommandBuilderAddOptionMethod =
  * The slash command options
  */
 export type SlashCommandOptions = 
-    Builders.SlashCommandStringOption |
-    Builders.SlashCommandIntegerOption |
-    Builders.SlashCommandNumberOption |
-    Builders.SlashCommandBooleanOption |
-    Builders.SlashCommandMentionableOption |
-    Builders.SlashCommandChannelOption |
-    Builders.SlashCommandRoleOption |
-    Builders.SlashCommandUserOption;
+    SlashCommandStringOption |
+    SlashCommandIntegerOption |
+    SlashCommandNumberOption |
+    SlashCommandBooleanOption |
+    SlashCommandMentionableOption |
+    SlashCommandChannelOption |
+    SlashCommandRoleOption |
+    SlashCommandUserOption;
 
 /**
  * The command will load into kommando.
@@ -211,7 +210,7 @@ export class Command {
      * @param input The sub command to add.
      */
     addSubcommand(input: SubcommandData): Command {
-        let data = new SlashCommandSubcommandBuilder();
+        let data = new SlashCommandSubcommandBuilder
 
         data
             .setName(input.name)
@@ -220,8 +219,7 @@ export class Command {
         if (input.options) {
             input.options.forEach(opti => {
                 let optionName = opti.type.charAt(0).toUpperCase() + opti.type.slice(1);
-                let methodName: SlashCommandBuilderAddOptionMethod = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
-
+                let methodName = `add${optionName}Option` as SlashCommandBuilderAddOptionMethod;
                 // @ts-ignore
                 data[methodName]((option: SlashCommandOptions) => {
                     let opt = (option)
@@ -230,11 +228,11 @@ export class Command {
                         .setRequired(opti.required ?? false);
 
                     // @ts-ignore
-                    data.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
-                    data.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
-                    data.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
-                    data.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
-                    data.maxValue != undefined && opt.setMaxValue(opti.maxValue);
+                    opti.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
+                    opti.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
+                    opti.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
+                    opti.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
+                    opti.maxValue != undefined && opt.setMaxValue(opti.maxValue);
 
                     return opt;
                 });
@@ -276,11 +274,11 @@ export class Command {
                                 .setRequired(opti.required ?? false);
 
                             // @ts-ignore
-                            data.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
-                            data.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
-                            data.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
-                            data.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
-                            data.maxValue != undefined && opt.setMaxValue(opti.maxValue);
+                            opti.choices?.length && opt.addChoices(...opti.choices.map(choice => { return { name: choice, value: choice }})); // @ts-ignore
+                            opti.autocomplete != undefined && opt.setAutocomplete(opti.autocomplete); // @ts-ignore
+                            opti.channelTypes?.length && opt.addChannelTypes(...opti.channelTypes); // @ts-ignore
+                            opti.minValue != undefined && opt.setMinValue(opti.minValue); // @ts-ignore
+                            opti.maxValue != undefined && opt.setMaxValue(opti.maxValue);
 
                             return opt;
                         });
@@ -313,7 +311,7 @@ export class Command {
      * Execute the command.
      * @param itr The interaction to execute the command with.
      */
-    async call(itr: CommandInteraction) {
+    async call(itr: ChatInputCommandInteraction) {
         if (this.requires.length) {
             let results: Array<boolean> = [];
 
