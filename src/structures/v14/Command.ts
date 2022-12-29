@@ -1,5 +1,5 @@
 import { ChannelType } from 'discord-api-types/v10';
-import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandMentionableOption, SlashCommandNumberOption, SlashCommandRoleOption, SlashCommandStringOption, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder, SlashCommandUserOption } from 'discord.js-14';
+import { ChatInputCommandInteraction, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandMentionableOption, SlashCommandNumberOption, SlashCommandRoleOption, SlashCommandStringOption, SlashCommandSubcommandBuilder, SlashCommandSubcommandGroupBuilder, SlashCommandUserOption } from 'discord.js-14';
 import { KommandoClient, Requirement } from '.';
 
 const allowedChannelTypes = [
@@ -120,7 +120,7 @@ export class Command {
     /**
      * The callbacks of the command.
      */
-    private readonly callbacks: { default: (itr: CommandInteraction) => void, [key: string]: (itr: CommandInteraction) => void }
+    private readonly callbacks: { default: (itr: ChatInputCommandInteraction) => void, [key: string]: (itr: ChatInputCommandInteraction) => void }
     
     /**
      * Create a new command handler.
@@ -297,7 +297,7 @@ export class Command {
      * @param callback The callback to add.
      * @param [subCommand] The sub command to add the callback to (Can contain spaces if it's subcommand group).
      */
-    handle(callback: (itr: CommandInteraction) => void, subCommand?: string): Command {
+    handle(callback: (itr: ChatInputCommandInteraction) => void, subCommand?: string): Command {
         if (subCommand) {
             this.callbacks[subCommand] = callback;
         } else {
@@ -316,8 +316,8 @@ export class Command {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(itr));
-                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

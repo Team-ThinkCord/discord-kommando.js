@@ -8,7 +8,7 @@ import { KommandoClient } from "./KommandoClient";
 import { Modal } from "./Modal";
 import { SelectMenu } from "./SelectMenu";
 
-interface CachedJSON {
+export interface CachedJSON {
     commands: unknown[],
     buttons: unknown[],
     selectmenus: unknown[],
@@ -69,20 +69,11 @@ export class Util {
         return;
     }
 
-    static arraysEqual(a: Array<unknown>, b: Array<unknown>): boolean {
-        if (a === b) return true;
-        if (a == null || b == null) return false;
-        if (a.length !== b.length) return false;
-      
-        // If you don't care about the order of the elements inside
-        // the array, you should sort both arrays here.
-        // Please note that calling sort on an array will modify that array.
-        // you might want to clone your array first.
-      
-        for (var i = 0; i < a.length; ++i) {
-            if (Array.isArray(a[i]) && !this.arraysEqual(a[i] as Array<unknown>, b[i] as Array<unknown>)) return false;
-            else if (a[i] !== b[i]) return false;
-        }
+    static arraysEqual(a_: Array<unknown>, b_: Array<unknown>): boolean {
+        let a = JSON.stringify(a_);
+        let b = JSON.stringify(b_);
+
+        if (a != b) return false;
 
         return true;
       }

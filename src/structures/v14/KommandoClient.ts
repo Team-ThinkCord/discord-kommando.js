@@ -185,16 +185,16 @@ export class KommandoClient extends Client {
             this.plugins.push((require(plugin.toLowerCase()) as Plugin).register(this));
         });
 
-        this.restManager = new REST({ version: '9'});
+        this.restManager = new REST({ version: '10'});
 
         if (this.kommando.directory.endsWith('/')) this.kommando.directory = this.kommando.directory.slice(0, this.kommando.directory.length - 1);
 
-        const commandsDirectory = this.kommando.useOldCommandDirectory ? `../../../../${this.kommando.directory}/` : `../../../../${this.kommando.directory}/commands/`;
+        const commandsDirectory = this.kommando.useOldCommandDirectory ? `../../../../../${this.kommando.directory}/` : `../../../../../${this.kommando.directory}/commands/`;
 
         if (fs.existsSync(`${this.kommando.directory}/requirements`)) {
             let requirementFiles = fs.readdirSync(`${this.kommando.directory}/requirements`).filter(file => file.endsWith('.js'));
             for (let file of requirementFiles) {
-                let requirement: Requirement | { default: Requirement } = require(`../../../../${this.kommando.directory}/requirements/${file}`);
+                let requirement: Requirement | { default: Requirement } = require(`../../../../../${this.kommando.directory}/requirements/${file}`);
 
                 if (requirement instanceof Requirement) 
                     this.requirements.set(requirement.name, requirement);
@@ -214,7 +214,7 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/buttons`)) {
             let buttonFiiles = fs.readdirSync(`${this.kommando.directory}/buttons`).filter(file => file.endsWith('.js'));
             for (let file of buttonFiiles) {
-                let button: Button | { default: Button } = require(`../../../../${this.kommando.directory}/buttons/${file}`);
+                let button: Button | { default: Button } = require(`../../../../../${this.kommando.directory}/buttons/${file}`);
 
                 if (button instanceof Button) 
                     this.buttons.set(button.id, button.register(this));
@@ -225,7 +225,7 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/selectmenus`)) {
             let selectMenuFiles = fs.readdirSync(`${this.kommando.directory}/selectmenus`).filter(file => file.endsWith('.js'));
             for (let file of selectMenuFiles) {
-                let selectMenu: SelectMenu | { default: SelectMenu} = require(`../../../../${this.kommando.directory}/selectmenus/${file}`);
+                let selectMenu: SelectMenu | { default: SelectMenu} = require(`../../../../../${this.kommando.directory}/selectmenus/${file}`);
 
                 if (selectMenu instanceof SelectMenu)
                     this.selectMenus.set(selectMenu.id, selectMenu.register(this));
@@ -236,7 +236,7 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/modals`)) {
             let modalFiles = fs.readdirSync(`${this.kommando.directory}/modals`).filter(file => file.endsWith('.js'));
             for (let file of modalFiles) {
-                let modal: Modal | { default: Modal } = require(`../../../../${this.kommando.directory}/modals/${file}`);
+                let modal: Modal | { default: Modal } = require(`../../../../../${this.kommando.directory}/modals/${file}`);
 
                 if (modal instanceof Modal)
                     this.modals.set(modal.id, modal.register(this));
@@ -247,7 +247,7 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/autocompletes`)) {
             let autocompleteFiles = fs.readdirSync(`${this.kommando.directory}/autocompletes`).filter(file => file.endsWith('.js'));
             for (let file of autocompleteFiles) {
-                let autocomplete: Autocomplete | { default: Autocomplete } = require(`../../../../${this.kommando.directory}/autocompletes/${file}`);
+                let autocomplete: Autocomplete | { default: Autocomplete } = require(`../../../../../${this.kommando.directory}/autocompletes/${file}`);
 
                 if (autocomplete instanceof Autocomplete)
                     this.autocompletes.set(autocomplete.name, autocomplete.register(this));
@@ -258,7 +258,7 @@ export class KommandoClient extends Client {
         if (fs.existsSync(`${this.kommando.directory}/contextmenus`)) {
             let contextMenuFiles = fs.readdirSync(`${this.kommando.directory}/contextmenus`).filter(file => file.endsWith('.js'));
             for (let file of contextMenuFiles) {
-                let contextMenu: ContextMenu | { default: ContextMenu } = require(`../../../../${this.kommando.directory}/contextmenus/${file}`);
+                let contextMenu: ContextMenu | { default: ContextMenu } = require(`../../../../../${this.kommando.directory}/contextmenus/${file}`);
 
                 if (contextMenu instanceof ContextMenu) 
                     this.contextMenuCommands.set(contextMenu.name, contextMenu.register(this));
@@ -279,8 +279,6 @@ export class KommandoClient extends Client {
     async registerCommands() {
         let oldCache = await Util.getCache();
         let newCache = Util.clientToCachedJSON(this);
-
-        console.log(oldCache);
 
         if (!Util.arraysEqual(oldCache.commands, newCache.commands) || !Util.arraysEqual(oldCache.contextmenus, newCache.contextmenus)) {
             let commands: unknown[] = [];

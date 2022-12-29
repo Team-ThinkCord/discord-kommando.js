@@ -1,7 +1,7 @@
 import { ButtonInteraction, ButtonBuilder, ButtonComponent, ButtonStyle, ButtonComponentData, ComponentBuilder } from "discord.js-14";
 import { KommandoClient, Requirement, Util } from ".";
 
-export type ButtonData = Omit<ButtonComponentData, 'customId'> & { id: string, requires?: string[] };
+export type ButtonData = Omit<Omit<ButtonComponentData, 'customId'>, 'type'> & { id: string, requires?: string[] };
 
 export class Button {
     /**
@@ -83,8 +83,8 @@ export class Button {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(button));
-                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

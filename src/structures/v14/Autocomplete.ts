@@ -88,9 +88,8 @@ export class Autocomplete {
             let results: boolean[] = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(itr));
-                if (results.includes(false))
-                    continue;
             }
 
             if (results.includes(false))

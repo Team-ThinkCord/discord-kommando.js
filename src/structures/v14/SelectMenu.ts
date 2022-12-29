@@ -1,7 +1,7 @@
 import { StringSelectMenuBuilder, StringSelectMenuComponentData, StringSelectMenuInteraction as SelectMenuInteraction } from "discord.js-14";
 import { KommandoClient, Requirement } from ".";
 
-export interface MenuData extends Omit<StringSelectMenuComponentData, 'customId'> {
+export interface MenuData extends Omit<Omit<StringSelectMenuComponentData, 'customId'>, 'type'> {
     id: string;
     requires?: string[];
 }
@@ -80,7 +80,7 @@ export class SelectMenu {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                if (results.includes(false)) continue;
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(menu));
             }
 

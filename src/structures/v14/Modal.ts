@@ -109,7 +109,7 @@ export class Modal {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                if (results.includes(false)) continue;
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(modal));
             }
 

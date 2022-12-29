@@ -1,4 +1,4 @@
-import { ContextMenuCommandBuilder, ContextMenuCommandInteraction } from "discord.js-14";
+import { ContextMenuCommandBuilder, ContextMenuCommandInteraction, MessageContextMenuCommandInteraction, UserContextMenuCommandInteraction } from "discord.js-14";
 import { KommandoClient, Requirement } from ".";
 
 export interface ContextMenuData {
@@ -27,7 +27,7 @@ export class ContextMenu {
 
     public toJSON: typeof ContextMenuCommandBuilder.prototype.toJSON;
 
-    private callback: (interaction: ContextMenuCommandInteraction) => void;
+    private callback: { USER: (itr: UserContextMenuCommandInteraction) => void, MESSAGE: (itr: MessageContextMenuCommandInteraction) => void };
 
     private data: ContextMenuCommandBuilder;
 
@@ -36,7 +36,7 @@ export class ContextMenu {
     public constructor(data: ContextMenuData) {
         this.name = data.name;
         this.type = data.type;
-        this.callback = () => {}
+        this.callback = { USER: () => {}, MESSAGE: () => {} }
         this.data = new ContextMenuCommandBuilder()
             .setName(data.name)
             .setType(data.type == 'USER' ? 2 : 3);
@@ -56,24 +56,27 @@ export class ContextMenu {
     }
 
     public handle(callback: (interaction: ContextMenuCommandInteraction) => void) {
-        this.callback = callback;
+        this.callback.USER = callback;
 
         return this;
     }
 
     async call(interaction: ContextMenuCommandInteraction) {
+        if (!interaction.isMessageContextMenuCommand() && !interaction.isUserContextMenuCommand()) return this;
+
         if (this.requires.length) {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
-                if (interaction.isMessageContextMenuCommand() || interaction.isUserContextMenuCommand()) results.push(await requirement!!.call(interaction));
-                if (results.includes(false)) continue;
+                if (results.includes(false)) break;
+                results.push(await requirement!!.call(interaction));
             }
 
-            if (results.includes(false)) return;
+            if (results.includes(false)) return this;
         }
 
-        this.callback(interaction);
+        if (interaction.isMessageContextMenuCommand()) this.callback.MESSAGE(interaction);
+        else if (interaction.isUserContextMenuCommand()) this.callback.USER(interaction);
         
         return this;
     }
