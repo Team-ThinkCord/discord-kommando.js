@@ -1,7 +1,8 @@
-import { ButtonInteraction, ButtonBuilder, ButtonComponent, ButtonStyle, ButtonComponentData, ComponentBuilder } from "discord.js-14";
+import { ButtonInteraction, ButtonBuilder, ButtonStyle, InteractionButtonComponentData, LinkButtonComponentData } from "discord.js-14";
 import { KommandoClient, Requirement, Util } from ".";
 
-export type ButtonData = Omit<Omit<ButtonComponentData, 'customId'>, 'type'> & { id: string, requires?: string[] };
+export type InteractionButtonData = Omit<Omit<InteractionButtonComponentData, 'customId'>, 'type'> & { id: string, requires?: string[] };
+export type LinkButtonData = Omit<LinkButtonComponentData, 'type'>;
 
 export class Button {
     /**
@@ -38,11 +39,11 @@ export class Button {
      * Create a new button handler.
      * @param data The data to create the button with.
      */
-    public constructor(data: ButtonData) {
-        this.id = data.id; 
+    public constructor(data: InteractionButtonData | LinkButtonData) {
+        this.id = (data as InteractionButtonData).id; 
         this.customId = (data.style != ButtonStyle.Link) ? data.id : undefined;
         this.requires = [];
-        this.rawRequires = data.requires ?? [];
+        this.rawRequires = (data as InteractionButtonData).requires ?? [];
         this.button = new ButtonBuilder(Util.isInteractionButtonOptions(data) ? { customId: this.id, ...data } : { ...data, style: ButtonStyle.Link });
         this.callback = () => {};
     }
@@ -61,7 +62,7 @@ export class Button {
      * Get the button.
      */
     public getButton(): ButtonBuilder {
-        return new ButtonBuilder({ ...this.button.toJSON() });
+        return new ButtonBuilder(this.button.toJSON());
     }
 
     /**

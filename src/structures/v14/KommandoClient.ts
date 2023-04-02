@@ -1,4 +1,4 @@
-import { Client, IntentsBitField, Collection, ClientOptions, Interaction, mergeDefault, REST } from 'discord.js-14';
+import { Client, IntentsBitField, Collection, ClientOptions, Interaction, mergeDefault, REST, CategoryChannel } from 'discord.js-14';
 import { Util } from '.';
 import fs from 'fs';
 import { Routes } from 'discord-api-types/v10';
@@ -73,7 +73,7 @@ export interface IKommandoOptions {
     };
 
     /**
-     * The test mod configurations.
+     * The test mode configurations.
      */
     test?: {
         /**
@@ -328,10 +328,14 @@ export class KommandoClient extends Client {
     public commandHandler(itr: Interaction) {
         if (!itr.isChatInputCommand()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
             let promise: Promise<undefined | Command> | undefined = this.commands.get(itr.commandName)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             });
@@ -349,10 +353,15 @@ export class KommandoClient extends Client {
     public buttonHandler(itr: Interaction) {
         if (!itr.isButton()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
+            
             let promise: Promise<undefined | Button> | undefined = this.buttons.find(btn => btn.customId == itr.customId)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             });
@@ -370,10 +379,14 @@ export class KommandoClient extends Client {
     public selectMenuHandler(itr: Interaction) {
         if (!itr.isStringSelectMenu()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
             let promise: Promise<undefined | SelectMenu> | undefined = this.selectMenus.find(menu => menu.id == itr.customId)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             });
@@ -386,10 +399,14 @@ export class KommandoClient extends Client {
     public modalHandler(itr: Interaction) {
         if (!itr.isModalSubmit()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
             let promise: Promise<undefined | Modal> | undefined = this.modals.find(modal => modal.id == itr.customId)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             });
@@ -402,8 +419,12 @@ export class KommandoClient extends Client {
     public autocompleteHandler(itr: Interaction) {
         if (!itr.isAutocomplete()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
             this.autocompletes.map(autocomplete => autocomplete.call(itr).catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             }));
@@ -416,10 +437,14 @@ export class KommandoClient extends Client {
     public contextMenuHandler(itr: Interaction) {
         if (!itr.isContextMenuCommand()) return;
 
+        if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+
         try {
             let promise: Promise<undefined | ContextMenu> | undefined = this.contextMenuCommands.get(itr.commandName)?.call(itr);
 
             if (promise instanceof Promise) promise.catch(err => {
+                if (!itr.channel?.isTextBased() || itr.channel instanceof CategoryChannel) return;
+                
                 console.error(err);
                 this.kommando.disableMessages || itr.channel!!.send(this.kommando.messages.ERROR);
             });

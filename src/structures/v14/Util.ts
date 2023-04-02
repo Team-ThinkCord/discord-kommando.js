@@ -1,7 +1,8 @@
-import { ButtonStyle, InteractionButtonComponentData } from "discord.js-14";
+import { InteractionButtonComponentData } from "discord.js-14";
+import { ButtonStyle } from "discord-api-types/v10";
 import fs from "fs/promises";
 import { Autocomplete } from "./Autocomplete";
-import { Button, ButtonData } from "./Button";
+import { Button, InteractionButtonData, LinkButtonData } from "./Button";
 import { Command } from "./Command";
 import { ContextMenu } from "./ContextMenu";
 import { KommandoClient } from "./KommandoClient";
@@ -18,7 +19,7 @@ export interface CachedJSON {
 }
 
 export class Util {
-    static isInteractionButtonOptions(o: ButtonData): o is Omit<InteractionButtonComponentData, 'customId'> & { id: string, requires: string[] } {
+    static isInteractionButtonOptions(o: InteractionButtonData | LinkButtonData): o is Omit<InteractionButtonComponentData, 'customId'> & { id: string, requires: string[] } {
         return o.style != ButtonStyle.Link;
     }
 

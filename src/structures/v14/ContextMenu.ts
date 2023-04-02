@@ -57,6 +57,7 @@ export class ContextMenu {
 
     public handle(callback: (interaction: ContextMenuCommandInteraction) => void) {
         this.callback.USER = callback;
+        this.callback.MESSAGE = callback;
 
         return this;
     }

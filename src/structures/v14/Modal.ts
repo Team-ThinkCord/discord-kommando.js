@@ -1,4 +1,5 @@
-import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, TextInputStyle, ActionRowBuilder as MessageActionRow, TextInputBuilder, TextInputComponent as TextInputComponent } from "discord.js-14";
+import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, ActionRowBuilder as MessageActionRow, TextInputBuilder } from "discord.js-14";
+import { TextInputStyle } from "discord-api-types/v10";
 import { KommandoClient, Requirement } from ".";
 
 export interface ModalData extends Omit<Omit<ModalComponentData, "customId">, "components"> {
@@ -87,7 +88,7 @@ export class Modal {
      * Get the modal.
      */
     public getModal(): DJSModal {
-        return new DJSModal(this.modal);
+        return new DJSModal(this.modal.toJSON());
     }
 
     /**
