@@ -29,9 +29,9 @@ export class ContextMenu {
 
     private callback: { USER: (itr: UserContextMenuCommandInteraction) => void, MESSAGE: (itr: MessageContextMenuCommandInteraction) => void };
 
-    private data: ContextMenuCommandBuilder;
+    private readonly data: ContextMenuCommandBuilder;
 
-    private rawRequires: string[];
+    private readonly rawRequires: string[];
 
     public constructor(data: ContextMenuData) {
         this.name = data.name;

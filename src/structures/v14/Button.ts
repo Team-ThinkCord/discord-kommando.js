@@ -26,7 +26,7 @@ export class Button {
     private rawRequires: string[];
 
     /**
-     * The builded button.
+     * The built button.
      */
     private button: ButtonBuilder;
 

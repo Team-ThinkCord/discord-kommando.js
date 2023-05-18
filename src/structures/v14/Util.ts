@@ -57,15 +57,11 @@ export class Util {
     }
 
     static async cacheClient(client: KommandoClient) {
-        console.log("Saving cache...");
-
         let cache = this.clientToCachedJSON(client);
 
         await fs.unlink("kommando_cache.json").catch(() => {});
 
         await fs.writeFile("kommando_cache.json", JSON.stringify(cache, null, 4));
-
-        console.log("Cache saving successful!");
 
         return;
     }
@@ -74,8 +70,6 @@ export class Util {
         let a = JSON.stringify(a_);
         let b = JSON.stringify(b_);
 
-        if (a != b) return false;
-
-        return true;
+        return a == b;
       }
 }

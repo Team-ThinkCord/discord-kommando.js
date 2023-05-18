@@ -23,7 +23,7 @@ export class SelectMenu {
     public requires: Array<Requirement | undefined>;
 
     /**
-     * The builded menu.
+     * The built menu.
      */
     private menu: StringSelectMenuBuilder;
 

@@ -22,7 +22,6 @@ export class Requirement {
     /**
      * Creates a new requirement.
      * @param name The name of the requirement.
-     * @param target The target to handle the requirement.
      */
     constructor(name: string) {
         this.name = name;

@@ -33,7 +33,7 @@ export class Modal {
     private rawRequires: string[];
 
     /**
-     * The builded modal.
+     * The built modal.
      */
     private modal: DJSModal;
 
