@@ -1,7 +1,10 @@
-import { ModalOptions, Modal as DJSModal, ModalSubmitInteraction, TextInputStyleResolvable, MessageActionRow, TextInputComponent, ModalActionRowComponentResolvable } from "discord.js";
+import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, ActionRowBuilder as MessageActionRow, TextInputBuilder, RepliableInteraction, Interaction } from "discord.js-14";
+import { TextInputStyle } from "discord-api-types/v10";
 import { KommandoClient, Requirement } from ".";
+import crypto from "node:crypto";
+import { ModalSubmitFields } from "discord.js";
 
-export interface ModalData extends Omit<Omit<ModalOptions, "customId">, "components"> {
+export interface ModalData extends Omit<Omit<ModalComponentData, "customId">, "components"> {
     id: string;
     components?: TextInputData[];
     requires?: string[];
@@ -14,7 +17,7 @@ export interface TextInputData {
     maxLength?: number;
     placeholder?: string;
     required?: boolean;
-    style: TextInputStyleResolvable;
+    style: TextInputStyle;
     value?: string;
 }
 
@@ -32,7 +35,7 @@ export class Modal {
     private rawRequires: string[];
 
     /**
-     * The builded modal.
+     * The built modal.
      */
     private modal: DJSModal;
 
@@ -51,14 +54,14 @@ export class Modal {
         this.modal = new DJSModal({ ...data, customId: data.id, components: [] });
         this.callback = () => {};
 
-        if (data.components?.length) this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(...data.components.map(c => new TextInputComponent(c))));
+        if (data.components?.length) this.modal.addComponents(new MessageActionRow<TextInputBuilder>().addComponents(...data.components.map(c => new TextInputBuilder(c))));
     }
 
     /**
      * Add a text input component to the modal.
      */
-    public addComponent(data: TextInputData | TextInputComponent) {
-        this.modal.addComponents(new MessageActionRow<TextInputComponent>().addComponents(new TextInputComponent(data)));
+    public addComponent(data: TextInputData | TextInputBuilder) {
+        this.modal.addComponents(new MessageActionRow<TextInputBuilder>().addComponents((data instanceof TextInputBuilder) ? data : new TextInputBuilder(data)));
 
         return this;
     }
@@ -66,7 +69,7 @@ export class Modal {
     /**
      * Add text input components to the modal.
      */
-    public addComponents(...components: TextInputData[] | TextInputComponent[]) {
+    public addComponents(...components: TextInputData[] | TextInputBuilder[]) {
         for (let i = 0; i < components.length; i++) 
             this.addComponent(components[i]);
 
@@ -87,7 +90,39 @@ export class Modal {
      * Get the modal.
      */
     public getModal(): DJSModal {
-        return this.modal;
+        return new DJSModal(this.modal.toJSON());
+    }
+
+    /**
+     * Show modal to user and recieve the input.
+     */
+    public getInput(itr: Exclude<RepliableInteraction, ModalSubmitInteraction>) {
+        return new Promise<ModalSubmitFields>((r, j) => {
+            if (itr.replied || itr.deferred) return j("Interaction already replied.");
+            
+            const id = crypto.createHash("md5")
+                .update(Math.floor(Math.random() * (99999999 - 10000000) + 10000000).toString())
+                .digest("hex");
+
+            itr.showModal(this.getModal().setCustomId(id));
+
+            let listener = async (itr: Interaction) => {
+                if (!itr.isModalSubmit() || itr.customId != id) return;
+                await itr.deferUpdate();
+
+                r(itr.fields);
+
+                itr.client.off("interactionCreate", listener);
+            }
+
+            itr.client.on("interactionCreate", listener);
+
+            setTimeout(() => {
+                itr.client.off("interactionCreate", listener);
+
+                j("Timed out")
+            }, 180 * 1000);
+        });
     }
 
     /**
@@ -109,8 +144,8 @@ export class Modal {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(modal));
-                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

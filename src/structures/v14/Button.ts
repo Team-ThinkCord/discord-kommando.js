@@ -1,18 +1,8 @@
-import { ButtonInteraction, InteractionButtonOptions, LinkButtonOptions, MessageButton } from "discord.js";
-import { MessageButtonStyles } from "discord.js/typings/enums";
-import { KommandoClient, Requirement } from ".";
+import { ButtonInteraction, ButtonBuilder, ButtonStyle, InteractionButtonComponentData, LinkButtonComponentData } from "discord.js-14";
+import { KommandoClient, Requirement, Util } from ".";
 
-export interface LinkButtonData extends LinkButtonOptions {
-    id: string;
-    requires?: string[];
-}
-
-export interface InteractionButtonData extends InteractionButtonOptions {
-    id: string;
-    requires?: string[];
-}
-
-export type ButtonData = LinkButtonData | InteractionButtonData;
+export type InteractionButtonData = Omit<Omit<InteractionButtonComponentData, 'customId'>, 'type'> & { id: string, requires?: string[] };
+export type LinkButtonData = Omit<LinkButtonComponentData, 'type'>;
 
 export class Button {
     /**
@@ -36,9 +26,9 @@ export class Button {
     private rawRequires: string[];
 
     /**
-     * The builded button.
+     * The built button.
      */
-    private button: MessageButton;
+    private button: ButtonBuilder;
 
     /**
      * The callback to call when the button is pressed.
@@ -49,12 +39,12 @@ export class Button {
      * Create a new button handler.
      * @param data The data to create the button with.
      */
-    public constructor(data: ButtonData) {
-        this.id = data.id; // @ts-ignore
-        this.customId = (data.style != "LINK" && data.style != MessageButtonStyles.LINK) ? data.customId : undefined;
+    public constructor(data: InteractionButtonData | LinkButtonData) {
+        this.id = (data as InteractionButtonData).id; 
+        this.customId = (data.style != ButtonStyle.Link) ? data.id : undefined;
         this.requires = [];
-        this.rawRequires = data.requires ?? [];
-        this.button = new MessageButton(data);
+        this.rawRequires = (data as InteractionButtonData).requires ?? [];
+        this.button = new ButtonBuilder(Util.isInteractionButtonOptions(data) ? { customId: this.id, ...data } : { ...data, style: ButtonStyle.Link });
         this.callback = () => {};
     }
 
@@ -71,8 +61,8 @@ export class Button {
     /**
      * Get the button.
      */
-    public getButton(): MessageButton {
-        return this.button;
+    public getButton(): ButtonBuilder {
+        return new ButtonBuilder(this.button.toJSON());
     }
 
     /**
@@ -94,8 +84,8 @@ export class Button {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(button));
-                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

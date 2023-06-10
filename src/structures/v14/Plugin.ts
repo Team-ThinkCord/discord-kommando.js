@@ -1,5 +1,5 @@
 import { Command, KommandoClient } from ".";
-import { ClientEvents, Collection, Util } from "discord.js";
+import { ClientEvents, Collection, mergeDefault } from "discord.js-14";
 
 export interface PluginConfig {
     /**
@@ -61,7 +61,7 @@ export class Plugin {
      * The events will load into the plugin.
      */
     public listeners: {
-        [key in keyof ClientEvents]?: ((...args: any[]) => void)[]
+        [key in keyof ClientEvents]?: ((...args: ClientEvents[key]) => void)[]
     };
 
     /**
@@ -98,9 +98,10 @@ export class Plugin {
      * @param event The event to listen to.
      * @param listener The listener to add.
      */
-    public on(event: keyof ClientEvents, listener: (...args: any[]) => void): void {
-        // @ts-ignore
-        this.listeners[event].push(listener);
+    public on<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void): void {
+        this.listeners[event] ??= [];
+
+        this.listeners[event]!!.push(listener);
     }
 
     /**
@@ -108,9 +109,8 @@ export class Plugin {
      * @param event The event to emit.
      * @param args The arguments to pass to the event.
      */
-    public emit(event: keyof ClientEvents, ...args: any[]): void {
-        // @ts-ignore
-        this.listeners[event].forEach(l => l(...args));
+    public emit<K extends keyof ClientEvents>(event: K, ...args: ClientEvents[K]): void {
+        this.listeners[event]?.forEach(l => l(...args));
     }
 
     /**
@@ -137,7 +137,7 @@ export class Plugin {
 
         for (const configKey in client.kommando.pluginConfigs) {
             if (configKey === this.name) {
-                this.config = Util.mergeDefault(this.config, client.kommando.pluginConfigs[configKey]);
+                this.config = mergeDefault(this.config, client.kommando.pluginConfigs[configKey]);
             }
         }
 

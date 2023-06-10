@@ -1,5 +1,9 @@
-import { KommandoClient } from './structures';
+import { version as rawVersion } from "discord.js";
 
-export * from './structures';
+const djsVer = rawVersion.split(".")[0];
 
-export default KommandoClient;
+import * as v14Structures from './structures/v14';
+
+export * from './structures/v14';
+
+export default v14Structures.KommandoClient;

@@ -1,14 +1,14 @@
-import { MessageSelectMenu, MessageSelectMenuOptions, SelectMenuInteraction } from "discord.js";
+import { StringSelectMenuBuilder, StringSelectMenuComponentData, StringSelectMenuInteraction as SelectMenuInteraction } from "discord.js-14";
 import { KommandoClient, Requirement } from ".";
 
-export interface MenuData extends Omit<MessageSelectMenuOptions, 'customId'> {
+export interface MenuData extends Omit<Omit<StringSelectMenuComponentData, 'customId'>, 'type'> {
     id: string;
     requires?: string[];
 }
 
 export class SelectMenu {
     /**
-     * The identifier of the menu..
+     * The identifier of the menu.
      */
     public id: string;
 
@@ -23,9 +23,9 @@ export class SelectMenu {
     public requires: Array<Requirement | undefined>;
 
     /**
-     * The builded menu.
+     * The built menu.
      */
-    private menu: MessageSelectMenu;
+    private menu: StringSelectMenuBuilder;
 
     /**
      * The callback to call when the menu is selected.
@@ -40,14 +40,13 @@ export class SelectMenu {
         this.id = data.id;
         this.rawRequires = data.requires ?? [];
         this.requires = [];
-        this.menu = new MessageSelectMenu(data);
         this.callback = () => {};
-        this.menu = new MessageSelectMenu({ ...data, customId: data.id });
+        this.menu = new StringSelectMenuBuilder({ ...data, customId: data.id });
     }
 
     /**
-     * Register the button to the client.
-     * @param client The client to register the button to.
+     * Register the menu to the client.
+     * @param client The client to register the menu to.
      */
      public register(client: KommandoClient): SelectMenu {
         this.requires.push(...this.rawRequires.map(rawReq => client.requirements.get(rawReq)));
@@ -56,17 +55,17 @@ export class SelectMenu {
     }
 
     /**
-     * Get the button.
+     * Get the menu.
      */
-    public getMenu(): MessageSelectMenu {
-        return this.menu;
+    public getMenu(): StringSelectMenuBuilder {
+        return new StringSelectMenuBuilder(this.menu.toJSON());
     }
 
     /**
-     * Set the callback to call when the button is pressed.
-     * @param callback The callback to call when the button is pressed.
+     * Set the callback to call when the menu is selected.
+     * @param callback The callback to call when the menu is selected.
      */
-    public handle(callback: (button: SelectMenuInteraction) => void): SelectMenu {
+    public handle(callback: (menu: SelectMenuInteraction) => void): SelectMenu {
         this.callback = callback;
 
         return this;
@@ -74,15 +73,15 @@ export class SelectMenu {
 
     /**
      * Call the callback.
-     * @param button The button that was pressed.
+     * @param menu The menu that was selected.
      */
     async call(menu: SelectMenuInteraction) {
         if (this.requires.length) {
             let results: Array<boolean> = [];
 
             for (const requirement of this.requires) {
+                if (results.includes(false)) break;
                 results.push(await requirement!!.call(menu));
-                if (results.includes(false)) continue;
             }
 
             if (results.includes(false)) return;

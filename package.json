@@ -1,16 +1,29 @@
 {
   "name": "discord-kommando.js",
-  "version": "2.1.5",
-  "description": "an Automatic command handler for discord.js",
+  "version": "2.2.0",
+  "description": "An automatic interaction handler for discord.js",
   "main": "dist/main.js",
-  "typings": "dist/main.d.ts",
   "exports": {
-    "import": "./esm.mjs",
-    "require": "./dist/main.js"
+    ".": {
+      "require": "./dist/main.js",
+      "import": "./v14.mjs",
+      "types": "./dist/main.d.ts"
+    },
+    "./v14": {
+      "require": "./dist/structures/v14/index.js",
+      "import": "./v14.mjs",
+      "types": "./dist/structures/v14/index.d.ts"
+    },
+    "./v14.js": {
+      "require": "./dist/structures/v14/index.js",
+      "import": "./v14.mjs",
+      "types": "./dist/structures/v14/index.d.ts"
+    }
   },
   "scripts": {
     "test": "echo **Error** No test specified.",
-    "prepublishOnly": "tsc",
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
     "docs": "typedoc src/main.ts"
   },
   "repository": {
@@ -28,12 +41,14 @@
   },
   "homepage": "https://github.com/Team-ThinkCord/discord-kommando.js#readme",
   "dependencies": {
-    "@discordjs/builders": "^0.16.0",
-    "@discordjs/rest": "^0.4.1",
-    "discord.js": "^13.9.0"
+    "discord-api-types": "^0.37.24",
+    "discord.js-14": "npm:discord.js@^14.11.0",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/node": "^17.0.30",
-    "typedoc": "^0.22.15"
+    "discord.js": "^14.11.0",
+    "typedoc": "^0.23.28",
+    "typescript": "^4.8.4"
   }
 }
