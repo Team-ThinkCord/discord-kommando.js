@@ -1,6 +1,6 @@
 {
   "name": "discord-kommando.js",
-  "version": "2.1.29-2.2BETA",
+  "version": "2.2.0",
   "description": "An automatic interaction handler for discord.js",
   "main": "dist/main.js",
   "exports": {

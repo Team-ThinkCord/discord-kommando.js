@@ -1,6 +1,8 @@
-import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, ActionRowBuilder as MessageActionRow, TextInputBuilder } from "discord.js-14";
+import { ModalComponentData, ModalBuilder as DJSModal, ModalSubmitInteraction, ActionRowBuilder as MessageActionRow, TextInputBuilder, RepliableInteraction, Interaction } from "discord.js-14";
 import { TextInputStyle } from "discord-api-types/v10";
 import { KommandoClient, Requirement } from ".";
+import crypto from "node:crypto";
+import { ModalSubmitFields } from "discord.js";
 
 export interface ModalData extends Omit<Omit<ModalComponentData, "customId">, "components"> {
     id: string;
@@ -89,6 +91,38 @@ export class Modal {
      */
     public getModal(): DJSModal {
         return new DJSModal(this.modal.toJSON());
+    }
+
+    /**
+     * Show modal to user and recieve the input.
+     */
+    public getInput(itr: Exclude<RepliableInteraction, ModalSubmitInteraction>) {
+        return new Promise<ModalSubmitFields>((r, j) => {
+            if (itr.replied || itr.deferred) return j("Interaction already replied.");
+            
+            const id = crypto.createHash("md5")
+                .update(Math.floor(Math.random() * (99999999 - 10000000) + 10000000).toString())
+                .digest("hex");
+
+            itr.showModal(this.getModal().setCustomId(id));
+
+            let listener = async (itr: Interaction) => {
+                if (!itr.isModalSubmit() || itr.customId != id) return;
+                await itr.deferUpdate();
+
+                r(itr.fields);
+
+                itr.client.off("interactionCreate", listener);
+            }
+
+            itr.client.on("interactionCreate", listener);
+
+            setTimeout(() => {
+                itr.client.off("interactionCreate", listener);
+
+                j("Timed out")
+            }, 180 * 1000);
+        });
     }
 
     /**
